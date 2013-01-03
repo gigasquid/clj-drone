@@ -11,10 +11,10 @@ land and emergency landing are implemented.
 
 More to come soon.
 
-  (initialize)
-  (drone :take-off)
-  (drone :land)
-  (drone :emergency)
+     (initialize)
+     (drone :take-off)
+     (drone :land)
+     (drone :emergency)
 
 
 ## License
