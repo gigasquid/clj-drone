@@ -11,14 +11,25 @@ land and emergency landing are implemented.
 
 More to come soon.
 
-     (initialize)
-     (drone :take-off)
-     (drone :land)
-     (drone :emergency)
+Sample Usage - Drone Takes off for 10 seconds and then lands
+
+    (ns clj-drone.example
+      (:use clj-drone.core))
+
+    (drone-initialize)
+    (drone :take-off)
+    (Thread/sleep 10000)
+    (drone :land)
+
+## Commands Supported
+
+    (drone :take-off)
+    (drone :land)
+    (drone :emergency)
 
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Carin Meier
 
 Distributed under the Eclipse Public License, the same as Clojure.

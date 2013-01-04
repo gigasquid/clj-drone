@@ -5,8 +5,8 @@
 (def default-drone-ip "192.168.1.1")
 (def default-at-port 5556)
 
-(defn initialize
-  ([] (initialize default-drone-ip default-at-port))
+(defn drone-initialize
+  ([] (drone-initialize default-drone-ip default-at-port))
   ([ip port]
     (def drone-host (InetAddress/getByName ip))
     (def at-port port)
