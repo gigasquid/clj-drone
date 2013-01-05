@@ -17,8 +17,8 @@
   (.send socket
     (new DatagramPacket (.getBytes data) (.length data) drone-host at-port)))
 
-(defn drone [command-key]
+(defn drone [command-key & [val]]
   (let [ seq-num (swap! counter inc)
-         data (build-command command-key seq-num )]
+         data (build-command command-key seq-num val)]
     (.send socket
       (new DatagramPacket (.getBytes data) (.length data) drone-host at-port))))
