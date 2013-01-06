@@ -26,6 +26,15 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
     (drone :take-off)
     (drone :land)
     (drone :emergency)
+    ;;movement commands take argument from 0-1
+    (drone :spin-right 0.5)
+    (drone :spin-left 1)
+    (drone :up 0.5)
+    (drone :down 1)
+    (drone :tilt-back 0.3)
+    (drone :tilt-front 1)
+    (drone :tilt-right 1)
+    (drone :tilt-left 1)
 
 
 ## License

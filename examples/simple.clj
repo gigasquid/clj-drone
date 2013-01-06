@@ -1,4 +1,4 @@
-(ns clj-drone.example
+(ns clj-drone.example.simple
   (:use clj-drone.core))
 
 (drone-initialize)

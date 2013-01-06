@@ -14,24 +14,22 @@
 
 (defn build-ref-command [command-key counter]
   (let [{:keys [command-class command-bit-vec]} (command-key commands)]
-    (str
-      command-class
-      "="
-      counter
-      ","
-      (build-command-int command-bit-vec)
-      "\r")))
+    (str command-class
+         "="
+         counter
+         ","
+         (build-command-int command-bit-vec)
+         "\r")))
 
 (defn build-pcmd-command [command-key counter val]
-  (let [{:keys [command-class command-vec]} (command-key commands)
-         ival (cast-float-to-int val)]
-    (str
-      command-class
-      "="
-      counter
-      ","
-      (apply str (interpose "," (replace {:x ival} command-vec)))
-      "\r")))
+  (let [{:keys [command-class command-vec dir]} (command-key commands)
+         ival (* dir (cast-float-to-int val))]
+    (str command-class
+         "="
+         counter
+         ","
+         (apply str (interpose "," (replace {:x ival} command-vec)))
+         "\r")))
 
 (defn build-command [command-key counter & [val]]
   (let [{:keys [command-class]} (command-key commands)]
