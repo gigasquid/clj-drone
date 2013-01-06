@@ -6,9 +6,8 @@ A Clojure library to control the Parrot AR Drone 2.0 [http://ardrone2.parrot.com
 
 ## Usage
 
-Just beginning the start of the control library, so far only take-off,
-land and emergency landing are implemented.
-
+Just beginning the start of the control library,so far only movement
+commands are supported
 More to come soon.
 
 Sample Usage - Drone Takes off for 10 seconds and then lands
