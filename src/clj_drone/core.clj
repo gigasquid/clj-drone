@@ -22,3 +22,9 @@
          data (build-command command-key seq-num val)]
     (.send socket
       (new DatagramPacket (.getBytes data) (.length data) drone-host at-port))))
+
+(defn drone-do-for [seconds command-key & [val]]
+  (when (> seconds 0)
+    (drone command-key val)
+    (Thread/sleep 30)
+    (drone-do-for (- seconds 0.03) command-key val)))

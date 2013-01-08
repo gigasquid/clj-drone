@@ -25,7 +25,9 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
     (drone :take-off)
     (drone :land)
     (drone :emergency)
-    ;;movement commands take argument from 0-1
+
+The movement commands take argument from 0-1
+
     (drone :spin-right 0.5)
     (drone :spin-left 1)
     (drone :up 0.5)
@@ -35,6 +37,18 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
     (drone :tilt-right 1)
     (drone :tilt-left 1)
 
+The drone-do-for command does a command for x second
+
+    (drone-do-for 4 :take-off) ;=> take off for 4 seconds
+    (drone-do-for 2 :spin-right 0.8) => spin right at 80% for 2 seconds
+    (drone-do-for 2 :spin-left 0.3) => spin left at 30% for 2 seconds
+
+## To do list
+:hover
+:fly roll pitch vertical spin
+:flat-trim
+:reset
+incoming data stream
 
 ## License
 
