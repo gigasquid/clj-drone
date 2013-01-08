@@ -25,7 +25,7 @@
   (is (= (build-command :tilt-front 3 0.5) "AT*PCMD=3,1,0,-1056964608,0,0\r"))
   (is (= (build-command :tilt-right 3 0.5) "AT*PCMD=3,1,1056964608,0,0,0\r"))
   (is (= (build-command :tilt-left 3 0.5) "AT*PCMD=3,1,-1056964608,0,0,0\r"))
-  )
+  (is (= (build-command :hover 3) "AT*PCMD=3,0,0,0,0,0\r")))
 
 
 

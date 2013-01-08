@@ -13,4 +13,5 @@
     :tilt-front {:command-class "AT*PCMD":command-bit-vec [] :command-vec [1 0 :x 0 0] :dir -1} ;val (0-1)
     :tilt-right {:command-class "AT*PCMD":command-bit-vec [] :command-vec [1 :x 0 0 0] :dir 1} ;val (0-1)
     :tilt-left  {:command-class "AT*PCMD":command-bit-vec [] :command-vec [1 :x 0 0 0] :dir -1} ;val (0-1)
+    :hover      {:command-class "AT*PCMD":command-bit-vec [] :command-vec [0 0 0 0 0] }
     })

@@ -7,4 +7,5 @@
 (drone-do-for 4 :take-off)
 (drone-do-for 2 :spin-right 0.8)
 (drone-do-for 2 :spin-left 0.3)
+(drone :hover)
 (drone :land)

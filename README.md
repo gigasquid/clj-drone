@@ -44,11 +44,10 @@ The drone-do-for command does a command for x second
     (drone-do-for 2 :spin-left 0.3) => spin left at 30% for 2 seconds
 
 ## To do list
-:hover
-:fly roll pitch vertical spin
-:flat-trim
-:reset
-incoming data stream
+- :fly roll pitch vertical spin
+- :flat-trim
+- :reset watchdog counter
+- incoming data stream
 
 ## License
 
