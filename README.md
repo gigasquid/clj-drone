@@ -27,7 +27,8 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
 ```clojure
 (drone :take-off)
 (drone :land)
-(drone :emergency)
+(drone :emergency) ; restores control of drone after emergency landing
+(drone :hover)
 ```
 
 The movement commands take argument from 0-1
@@ -47,8 +48,8 @@ The drone-do-for command does a command for x second
 
 ```clojure
 (drone-do-for 4 :take-off) ;=> take off for 4 seconds
-(drone-do-for 2 :spin-right 0.8) => spin right at 80% for 2 seconds
-(drone-do-for 2 :spin-left 0.3) => spin left at 30% for 2 seconds
+(drone-do-for 2 :spin-right 0.8) ;=> spin right at 80% for 2 seconds
+(drone-do-for 2 :spin-left 0.3) ;=> spin left at 30% for 2 seconds
 ```
 
 ## To do list
