@@ -11,7 +11,8 @@
     (def drone-host (InetAddress/getByName ip))
     (def at-port port)
     (def socket (DatagramSocket. ))
-    (def counter (atom 0))))
+    (def counter (atom 0))
+    (drone :flat-trim)))
 
 (defn send-command [data]
   (.send socket

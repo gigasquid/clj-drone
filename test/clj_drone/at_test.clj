@@ -27,7 +27,9 @@
   (is (= (build-command :tilt-left 3 0.8) "AT*PCMD=3,1,-1085485875,0,0,0\r"))
   (is (= (build-command :hover 3) "AT*PCMD=3,0,0,0,0,0\r"))
   (is (= (build-command :fly 3 0.5 -0.8 0.5 -0.8)
-         "AT*PCMD=3,1,1056964608,-1085485875,1056964608,-1085485875\r")))
+        "AT*PCMD=3,1,1056964608,-1085485875,1056964608,-1085485875\r"))
+  (is (= (build-command :flat-trim 3) "AT*FTRIM=3,\r"))
+  )
 
 
 ;; (run-tests 'clj-drone.at-test)

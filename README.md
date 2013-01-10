@@ -27,8 +27,9 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
 ```clojure
 (drone :take-off)
 (drone :land)
-(drone :emergency) ; restores control of drone after emergency landing
+(drone :emergency) ;; restores control of drone after emergency landing
 (drone :hover)
+(drone :flat-trim) ;; called on initialize as well to tell drone it is flat on the ground
 ```
 
 The movement commands take argument from 0-1
@@ -61,7 +62,6 @@ The drone-do-for command does a command for x second
 ```
 
 ## To do list
-- :flat-trim
 - :reset watchdog counter
 - incoming data stream
 
