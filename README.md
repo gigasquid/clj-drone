@@ -10,6 +10,13 @@ Just beginning the start of the control library,so far only movement
 commands are supported
 More to come soon.
 
+Using with Leiningen
+```clojure
+(defproject your-project "0.1.0-SNAPSHOT"
+  :description: "Your project"
+  :dependencies [[clj-drone "0.1.0-SNAPSHOT"]])
+````
+
 Sample Usage - Drone Takes off for 10 seconds and then lands
 
 ```clojure
