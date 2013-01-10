@@ -9,5 +9,6 @@
 (drone-do-for 2 :tilt-right 0.5)
 (drone-do-for 2 :spin-right 0.8)
 (drone-do-for 2 :spin-left 0.5)
+(drone-do-for 2 :fly 0.3 0.3 0 0)
 (drone :hover)
 (drone :land)

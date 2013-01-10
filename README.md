@@ -44,6 +44,14 @@ The movement commands take argument from 0-1
 (drone :tilt-left 1)
 ```
 
+The fly command takes arguments left-right tilt, front-back tilt,
+vertical speed, angular speed.  The arguments are all in the range -1
+to 1.
+
+```clojure
+(drone :fly 0.3 -0.9 0.7 -0.2)
+```
+
 The drone-do-for command does a command for x second
 
 ```clojure
@@ -53,7 +61,6 @@ The drone-do-for command does a command for x second
 ```
 
 ## To do list
-- :fly roll pitch vertical spin
 - :flat-trim
 - :reset watchdog counter
 - incoming data stream
