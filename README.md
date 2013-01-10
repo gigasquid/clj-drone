@@ -67,7 +67,8 @@ number gets out of sync.  It will ignore commands that come in with a bad or out
 ````
 
 ## To do list
-- incoming data stream
+- incoming navigation data stream
+- incoming video stream
 
 ## License
 
