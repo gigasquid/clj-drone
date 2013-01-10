@@ -60,9 +60,13 @@ The drone-do-for command does a command for x second
 (drone-do-for 2 :spin-right 0.8) ;=> spin right at 80% for 2 seconds
 (drone-do-for 2 :spin-left 0.3) ;=> spin left at 30% for 2 seconds
 ```
+The drone reset-watchdog command is used for when the drone command sequence
+number gets out of sync.  It will ignore commands that come in with a bad or out of sync sequence number.  Calling this resets it to zero.  The drone will drop it's connection and reset its counter to 0 by itself if no command is received from the client for 2 seconds.
+````clojure
+(drone :reset-watchdog)
+````
 
 ## To do list
-- :reset watchdog counter
 - incoming data stream
 
 ## License

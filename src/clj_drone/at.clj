@@ -30,7 +30,7 @@
          (apply str (interpose "," (replace {:v v-val :w w-val :x x-val :y y-val} command-vec)))
       "\r")))
 
-(defn build-ftrim-command [command-key counter]
+(defn build-simple-command [command-key counter]
    (let [{:keys [command-class]} (command-key commands)]
     (str (build-base-command command-class counter)
          "\r")))
@@ -40,5 +40,6 @@
     (case command-class
       "AT*REF"  (build-ref-command command-key counter)
       "AT*PCMD" (build-pcmd-command command-key counter values)
-      "AT*FTRIM" (build-ftrim-command command-key counter)
+      "AT*FTRIM" (build-simple-command command-key counter)
+      "AT*COMWDG" (build-simple-command command-key counter)
       :else     (throw (Exception. "Unsupported Drone Command")))))

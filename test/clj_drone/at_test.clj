@@ -29,7 +29,7 @@
   (is (= (build-command :fly 3 0.5 -0.8 0.5 -0.8)
         "AT*PCMD=3,1,1056964608,-1085485875,1056964608,-1085485875\r"))
   (is (= (build-command :flat-trim 3) "AT*FTRIM=3,\r"))
-  )
+  (is (= (build-command :reset-watchdog 3) "AT*COMWDG=3,\r")))
 
 
 ;; (run-tests 'clj-drone.at-test)
