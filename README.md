@@ -13,7 +13,7 @@ More to come soon.
 Using with Leiningen
 ```clojure
 (defproject your-project "0.1.0-SNAPSHOT"
-  :description: "Your project"
+  :description "Your project"
   :dependencies [[clj-drone "0.1.0-SNAPSHOT"]])
 ````
 
