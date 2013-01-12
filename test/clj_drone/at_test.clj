@@ -30,4 +30,4 @@
   (is (= (build-command :init-navdata 3) "AT*CONFIG=3,\"general:navdata_demo\",\"TRUE\"\r"))
   (is (= (build-command :control-ack 3) "AT*CTRL=3,0\r")))
 
-(run-tests 'clj-drone.at-test)
+;; (run-tests 'clj-drone.at-test)
