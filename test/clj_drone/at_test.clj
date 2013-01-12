@@ -2,10 +2,6 @@
   (:use clojure.test
         clj-drone.at))
 
-(cast-float-to-int 0.5)
-(int -1085485875)
-
-
 (deftest building-command-int
   (is (= 290717696 (build-command-int [18 20 22 24 28])))
   (is (= 290718208 (build-command-int [9 18 20 22 24 28]))))
@@ -32,10 +28,6 @@
   (is (= (build-command :flat-trim 3) "AT*FTRIM=3,\r"))
   (is (= (build-command :reset-watchdog 3) "AT*COMWDG=3,\r"))
   (is (= (build-command :init-navdata 3) "AT*CONFIG=3,\"general:navdata_demo\",\"TRUE\"\r"))
-  (is (= (build-command :control-ack 3) "AT*CTRL=3,0\r"))
-
-  )
-
-
+  (is (= (build-command :control-ack 3) "AT*CTRL=3,0\r")))
 
 (run-tests 'clj-drone.at-test)
