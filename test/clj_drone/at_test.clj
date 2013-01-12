@@ -30,8 +30,12 @@
         "AT*PCMD=3,1,1056964608,-1085485875,1056964608,-1085485875\r"))
   (is (= (build-command :fly 3 0 0 0 0.5) (build-command :spin-right 3 0.5)))
   (is (= (build-command :flat-trim 3) "AT*FTRIM=3,\r"))
-  (is (= (build-command :reset-watchdog 3) "AT*COMWDG=3,\r")))
+  (is (= (build-command :reset-watchdog 3) "AT*COMWDG=3,\r"))
+  (is (= (build-command :init-navdata 3) "AT*CONFIG=3,\"general:navdata_demo\",\"TRUE\"\r"))
+  (is (= (build-command :control-ack 3) "AT*CTRL=3,0\r"))
+
+  )
 
 
 
-;; (run-tests 'clj-drone.at-test)
+(run-tests 'clj-drone.at-test)

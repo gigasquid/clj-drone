@@ -28,12 +28,19 @@
          y-val (when y (cast-float-to-int y))]
     (str (build-base-command command-class counter)
          (apply str (interpose "," (replace {:v v-val :w w-val :x x-val :y y-val} command-vec)))
-      "\r")))
+          "\r")))
 
 (defn build-simple-command [command-key counter]
-   (let [{:keys [command-class]} (command-key commands)]
-    (str (build-base-command command-class counter)
-         "\r")))
+   (let [{:keys [command-class value]} (command-key commands)]
+     (str (build-base-command command-class counter)
+           value
+           "\r")))
+
+(defn build-config-command [command-key counter]
+   (let [{:keys [command-class option value]} (command-key commands)]
+     (str (build-base-command command-class counter)
+          (apply str (interpose "," [option, value]))
+           "\r")))
 
 (defn build-command [command-key counter & values]
   (let [{:keys [command-class]} (command-key commands)]
@@ -42,4 +49,6 @@
       "AT*PCMD" (build-pcmd-command command-key counter values)
       "AT*FTRIM" (build-simple-command command-key counter)
       "AT*COMWDG" (build-simple-command command-key counter)
+      "AT*CONFIG" (build-config-command command-key counter)
+      "AT*CTRL" (build-simple-command command-key counter)
       :else     (throw (Exception. "Unsupported Drone Command")))))

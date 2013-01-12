@@ -17,4 +17,7 @@
     :fly             {:command-class "AT*PCMD" :command-vec [1 :v :w :x :y] :dir 1}
     :flat-trim       {:command-class "AT*FTRIM"}
     :reset-watchdog  {:command-class "AT*COMWDG"}
+    :init-navdata    {:command-class "AT*CONFIG" :option "\"general:navdata_demo\""
+                                                 :value "\"TRUE\""}
+    :control-ack     {:command-class "AT*CTRL" :value 0}
     })
