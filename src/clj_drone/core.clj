@@ -24,8 +24,7 @@
 (defn drone [command-key & [w x y z]]
   (let [ seq-num (swap! counter inc)
          data (build-command command-key seq-num w x y z)]
-    (.send at-socket
-      (new DatagramPacket (.getBytes data) (.length data) drone-host at-port))))
+    (send-command data)))
 
 (defn drone-do-for [seconds command-key & [w x y z]]
   (when (> seconds 0)
