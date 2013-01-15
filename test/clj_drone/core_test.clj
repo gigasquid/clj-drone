@@ -9,12 +9,16 @@
   (fact "default initialize gets default host and port"
     (.getHostName drone-host) => default-drone-ip
     at-port => default-at-port
+    navdata-port => default-navdata-port
+    @counter => 1
     (against-background (before :facts (drone-initialize))))
 
   (fact "custom initiliaze uses custom host and port"
     (.getHostName drone-host) => "192.168.2.2"
     at-port => 4444
-    (against-background (before :facts (drone-initialize "192.168.2.2" 4444))))
+    navdata-port => 3333
+    @counter => 1
+    (against-background (before :facts (drone-initialize "192.168.2.2" 4444 3333))))
 
   (fact "drone command passes along the data to send-command"
     (drone :take-off) => anything
