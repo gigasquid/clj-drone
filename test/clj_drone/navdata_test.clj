@@ -9,6 +9,9 @@
 (def port 5554)
 (def socket (DatagramSocket. ))
 
+
+
+
 (deftest navdata-tests
 
   (fact "about new-datagram-packet"
@@ -24,17 +27,4 @@
   (fact "about parse-navdata"
     (parse-navdata header) => anything
     @nav-data => {:header 0x55667788}
-    (against-background (before :facts (reset! nav-data {}))))
-
-  (fact "about init-streaming-navdata"
-    (let [data (byte-array (map byte [1 0 0 0]))]
-      (init-streaming-navdata socket host port) => anything
-      @nav-data => {:header 0x55667788}
-      (provided
-        (send-navdata socket (new-datagram-packet data host port)) => 1
-        (receive-navdata socket (new-datagram-packet data host port)) => 1
-        (get-navdata-bytes anything) => header)
-      (against-background (before :facts (reset! nav-data {}))))
-    )
-
-)
+    (against-background (before :facts (reset! nav-data {})))))
