@@ -17,13 +17,13 @@
   (let [header (get-int navdata-bytes 0)]
     (swap! nav-data assoc :header header)))
 
-(defn send-navdata [navdata-socket datagram-packet]
+(defn  ^:dynamic send-navdata  [navdata-socket datagram-packet]
   (.send navdata-socket datagram-packet))
 
-(defn receive-navdata [navdata-socket datagram-packet]
+(defn  ^:dynamic receive-navdata  [navdata-socket datagram-packet]
   (.receive navdata-socket datagram-packet))
 
-(defn get-navdata-bytes [datagram-packet]
+(defn  ^:dynamic get-navdata-bytes  [datagram-packet]
   (.getData datagram-packet))
 
 (defn init-streaming-navdata [navdata-socket host port]
