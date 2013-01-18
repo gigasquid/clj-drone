@@ -1,10 +1,20 @@
 (ns clj-drone.example.navigation
   (:use clj-drone.core
         clj-drone.navdata)
-  (:require [bytebuffer.buff :as bb] )
-  (:import (java.nio ByteBuffer))
-  (:import (java.net DatagramPacket DatagramSocket InetAddress))
-  )
+  (:import (java.net DatagramPacket DatagramSocket InetAddress)))
+
+
+
+@nav-data
+(reset! nav-data {})
+(drone-initialize)
+(drone-init-navdata)
+@nav-data
+(drone :reset-watchdog)
+
+
+
+;;;;;;;;;work area to debug the response
 
 
 (drone-initialize)
@@ -20,41 +30,6 @@
 (.send navdata-socket nav-datagram-send-packet)
 (.receive navdata-socket nav-datagram-receive-packet)
 (def navdata (.getData nav-datagram-receive-packet))
-(first navdata)
-(count navdata) => 4096
-()
-(first (.getData nav-datagram-receive-packet)) ;=> -120
-(byte-array (map byte [1 0 0 0]))
-
-
-(def x [1 2 3 4])
-(take 3 x)
-(def header (take 32 navdata))
-header
-header
-navdata
-
-(/ 4096 8)
-(def mybuff (bb/byte-buffer 4096))
-(.put mybuff navdata)
-(.flip mybuff)
-(def header (bb/take-int mybuff))
-(def drone-state (bb/take-int mybuff))
-drone-state
-header
-(class (take 4 navdata))
-
-
-(def bold (ByteBuffer/allocate 4096))
-bold
-(.put bold navdata)
-(.flip bold)
-(def header-bytes (byte-array 4))
-(def hb (.get bold header-bytes 0 4))
-(bb/take-int hb)
-(.get hb 0)
-(first (.array hb))
-(.get (.asIntBuffer (.get bold header-bytes 0 4)) 0)  ; sb 1432778632
 
 
 (bit-and (nth header-bytes 0)  0x000000FF)

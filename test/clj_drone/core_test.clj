@@ -23,7 +23,7 @@
   (fact "drone command passes along the data to send-command"
     (drone :take-off) => anything
     (provided
-      (send-command  "AT*REF=2,290718208\r") => 1)
+      (send-command "AT*REF=2,290718208\r") => 1)
     (against-background (before :facts (drone-initialize))))
 
   (fact "drone-do-for command calls drone command every 30 sec"

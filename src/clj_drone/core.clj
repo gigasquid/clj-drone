@@ -1,6 +1,7 @@
 (ns clj-drone.core
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
-  (:use clj-drone.at))
+  (:use clj-drone.at
+        clj-drone.navdata))
 
 (def default-drone-ip "192.168.1.1")
 (def default-at-port 5556)
@@ -36,3 +37,9 @@
     (drone command-key w x y z)
     (Thread/sleep 30)
     (drone-do-for (- seconds 0.03) command-key w x y z)))
+
+(defn drone-init-navdata []
+  (do
+    (drone :init-navdata)
+    (drone :control-ack)
+    (init-streaming-navdata navdata-socket drone-host navdata-port)))
