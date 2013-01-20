@@ -31,3 +31,48 @@
     (send-navdata anything anything) => 1
     (receive-navdata anything anything) => 1
     (get-navdata-bytes anything) => header))
+
+(fact "about parse-nav-state"
+  (let [ state 260048080
+         result (parse-nav-state state)
+         {:keys [ flying video vision control altitude-control
+                  user-feedback command-ack camera travelling
+                  usb demo bootstrap motors communication
+                  software battery emergency-landing timer
+                  magneto angles wind ultrasound cutout
+                  pic-version atcodec-thread navdata-thread
+                  video-thread acquisition-thread ctrl-watchdog
+                  adc-watchdog com-watchdog emergency]} result]
+    flying => :landed
+    video => :off
+    vision => :off
+    control => :euler-angles
+    altitude-control => :on
+    user-feedback => :off
+    command-ack => :received
+    camera => :ready
+    travelling => :off
+    usb => :not-ready
+    demo => :on
+    bootstrap => :off
+    motors => :ok
+    communication => :ok
+    software => :ok
+    battery => :ok
+    emergency-landing => :off
+    timer => :not-elapsed
+    magneto => :ok
+    angles => :ok
+    wind => :ok
+    ultrasound => :ok
+    cutout => :ok
+    pic-version => :ok
+    atcodec-thread => :on
+    navdata-thread => :on
+    video-thread => :on
+    acquisition-thread => :on
+    ctrl-watchdog => :ok
+    adc-watchdog => :ok
+    com-watchdog => :ok
+    emergency => :ok
+    ))
