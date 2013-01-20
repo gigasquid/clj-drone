@@ -25,11 +25,15 @@
   (new DatagramPacket (byte-array (map byte [1 0 0 0])) 1 drone-host 5554)
   )
 (def nav-datagram-receive-packet
-  (new DatagramPacket (byte-array 4096) 4096 drone-host 5554))
+  (new DatagramPacket (byte-array 2048) 2048 drone-host 5554))
 (.setSoTimeout navdata-socket 1000)
 (.send navdata-socket nav-datagram-send-packet)
 (.receive navdata-socket nav-datagram-receive-packet)
 (def navdata (.getData nav-datagram-receive-packet))
+
+navdata
+(def state (get-int navdata 4))
+(bit-and state 1)
 
 
 (bit-and (nth header-bytes 0)  0x000000FF)

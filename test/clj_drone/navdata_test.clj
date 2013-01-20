@@ -27,11 +27,12 @@
   @nav-data => (contains {:header 0x55667788})
   @nav-data => (contains {:battery :ok})
   @nav-data => (contains {:flying :landed})
-  (against-background (before :facts (reset! nav-data {}))))
+  (against-background (before :facts (reset! nav-data {})))
+  )
 
 
 (fact "about init-streaming-navdata"
-  (init-streaming-navdata socket host port) => {:header 0x55667788}
+  (init-streaming-navdata socket host port) => (contains {:header 0x55667788} )
   (provided
     (send-navdata anything anything) => 1
     (receive-navdata anything anything) => 1
