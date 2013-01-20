@@ -2,6 +2,7 @@
   (:import (java.net DatagramPacket DatagramSocket InetAddress)))
 
 (def nav-data (atom {}))
+(def stop-navstream (atom false))
 
 (def state-masks
   [ {:name :flying             :mask 0  :values [:landed :flying]}
@@ -72,6 +73,15 @@
 (defn get-navdata-bytes  [datagram-packet]
   (.getData datagram-packet))
 
+(defn stream-navdata [socket packet]
+  (do
+    (receive-navdata socket packet)
+    (parse-navdata (get-navdata-bytes packet))
+    (println @nav-data)
+    (if @stop-navstream
+      "navstream ended"
+      (stream-navdata socket packet))))
+
 (defn init-streaming-navdata [navdata-socket host port]
   (let [ send-data (byte-array (map byte [1 0 0 0]))
          nav-datagram-send-packet (new-datagram-packet send-data host port)
@@ -81,7 +91,6 @@
     (do
       (.setSoTimeout navdata-socket 1000)
       (send-navdata navdata-socket nav-datagram-send-packet)
-      (receive-navdata navdata-socket nav-datagram-receive-packet)
-      (parse-navdata (get-navdata-bytes nav-datagram-receive-packet))
+      (future (stream-navdata navdata-socket nav-datagram-receive-packet))
       )))
 

@@ -32,11 +32,13 @@
 
 
 (fact "about init-streaming-navdata"
-  (init-streaming-navdata socket host port) => (contains {:header 0x55667788} )
+  (init-streaming-navdata socket host port) => anything
   (provided
     (send-navdata anything anything) => 1
     (receive-navdata anything anything) => 1
-    (get-navdata-bytes anything) => nav-input))
+    (get-navdata-bytes anything) => nav-input)
+  (against-background (before :facts (reset! stop-navstream true))))
+
 
 (fact "about parse-nav-state"
   (let [ state 260048080
