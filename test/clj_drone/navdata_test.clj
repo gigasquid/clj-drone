@@ -4,7 +4,10 @@
     clj-drone.navdata)
   (:import (java.net InetAddress DatagramSocket)))
 
-(def header [(byte -120) (byte 119) (byte 102) (byte 85)])
+(def b-header [-120 119 102 85])
+(def b-state [-48 4 -128 15])
+(def header (map byte [-120 119 102 85]))
+(def nav-input  (map byte (flatten (cons b-header b-state))))
 (def host (InetAddress/getByName "192.168.1.1"))
 (def port 5554)
 (def socket (DatagramSocket. ))
@@ -20,8 +23,10 @@
   (get-int (byte-array header) 0) => 0x55667788)
 
 (fact "about parse-navdata"
-  (parse-navdata header) => anything
-  @nav-data => {:header 0x55667788}
+  (parse-navdata nav-input) => anything
+  @nav-data => (contains {:header 0x55667788})
+  @nav-data => (contains {:battery :ok})
+  @nav-data => (contains {:flying :landed})
   (against-background (before :facts (reset! nav-data {}))))
 
 
@@ -30,7 +35,7 @@
   (provided
     (send-navdata anything anything) => 1
     (receive-navdata anything anything) => 1
-    (get-navdata-bytes anything) => header))
+    (get-navdata-bytes anything) => nav-input))
 
 (fact "about parse-nav-state"
   (let [ state 260048080
