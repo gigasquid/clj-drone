@@ -1,5 +1,14 @@
 (ns clj-drone.navdata
-  (:import (java.net DatagramPacket DatagramSocket InetAddress)))
+  (require [ clj-logging-config.log4j :as log-config]
+           [ clojure.tools.logging :as log])
+(:import (java.net DatagramPacket DatagramSocket InetAddress)))
+
+(log-config/set-logger! :level :debug
+                        :out (org.apache.log4j.FileAppender.
+                              (org.apache.log4j.EnhancedPatternLayout. org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
+                              "logs/drone.log"
+                               true))
+
 
 (def nav-data (atom {}))
 (def stop-navstream (atom false))
@@ -78,7 +87,7 @@
   (do
     (receive-navdata socket packet)
     (parse-navdata (get-navdata-bytes packet))
-    (println @nav-data)
+    (log/info (str "Navdata: " @nav-data))
     (if @stop-navstream
       "navstream ended"
       (stream-navdata socket packet))))

@@ -6,9 +6,12 @@
 
 
 @nav-data
+(reset! stop-navstream false )
 (reset! nav-data {})
 (drone-initialize)
 (drone-init-navdata)
+(drone :take-off)
+(drone :land)
 @nav-data
 (drone :reset-watchdog)
 
@@ -31,27 +34,14 @@
 (.receive navdata-socket nav-datagram-receive-packet)
 (def navdata (.getData nav-datagram-receive-packet))
 
-navdata
+
+(nth navdata 11)
 (def state (get-int navdata 4))
-(bit-and state 1)
-
-
-(bit-and (nth header-bytes 0)  0x000000FF)
-;;; yes works
-(+
-  (bit-shift-left (bit-and (nth navdata 0) 0x000000FF) (* 8 0))
-  (bit-shift-left (bit-and (nth navdata 1) 0x000000FF) (* 8 1))
-  (bit-shift-left (bit-and (nth navdata 2) 0x000000FF) (* 8 2))
-  (bit-shift-left (bit-and (nth navdata 3) 0x000000FF) (* 8 3))
-  )
-
-(let [c 0x000000FF]
-  (reduce
-    #(+ %1 (bit-shift-left (bit-and (nth navdata %2) c) (* 8 %2)))
-    0
-    [0 1 2 3]))
-
-(get-int-from-bytes navdata 0)
+(def seq-num (get-int navdata 8))
+(def x (map byte [102 3 0 0]))
+(get-int x 0)
+seq-num
+state
 
 
 
