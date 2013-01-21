@@ -61,7 +61,8 @@
 (defn parse-navdata [navdata-bytes]
   (let [ header (get-int navdata-bytes 0)
          state (get-int navdata-bytes 4)
-         new-data (merge {:header header} (parse-nav-state state))]
+         seqnum (get-int navdata-bytes 8)
+         new-data (merge {:header header :seq-num seqnum} (parse-nav-state state))]
     (swap! nav-data merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]

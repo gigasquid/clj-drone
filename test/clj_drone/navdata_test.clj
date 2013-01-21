@@ -6,11 +6,13 @@
 
 (def b-header [-120 119 102 85])
 (def b-state [-48 4 -128 15])
+(def b-seqnum [102 3 0 0])
 (def header (map byte [-120 119 102 85]))
-(def nav-input  (map byte (flatten (cons b-header b-state))))
+(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum))))
 (def host (InetAddress/getByName "192.168.1.1"))
 (def port 5554)
 (def socket (DatagramSocket. ))
+(def packet (new-datagram-packet (byte-array 2048) host port))
 
 (fact "about new-datagram-packet"
   (let [data (byte-array (map byte [1 0 0 0]))
@@ -27,14 +29,13 @@
   @nav-data => (contains {:header 0x55667788})
   @nav-data => (contains {:battery :ok})
   @nav-data => (contains {:flying :landed})
-  (against-background (before :facts (reset! nav-data {})))
-  )
+  @nav-data => (contains {:seq-num 870})
+  (against-background (before :facts (reset! nav-data {}))))
 
 
-(fact "about init-streaming-navdata"
-  (init-streaming-navdata socket host port) => anything
+(fact "about stream-navdata"
+  (stream-navdata socket packet) => anything
   (provided
-    (send-navdata anything anything) => 1
     (receive-navdata anything anything) => 1
     (get-navdata-bytes anything) => nav-input)
   (against-background (before :facts (reset! stop-navstream true))))
