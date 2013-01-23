@@ -36,7 +36,7 @@
 (def navdata (.getData nav-datagram-receive-packet))
 
 
-(nth navdata 39)
+(nth navdata 163)
 (def state (get-int navdata 4))
 (def seq-num (get-int navdata 8))
 (def vision-flag (get-int navdata 12))
@@ -47,6 +47,17 @@
 (def demo-pitch (get-float navdata 28))
 (def demo-roll (get-float navdata 32))
 (def demo-yaw (get-float navdata 36))
+(def demo-altitude (get-int navdata 40))
+(def new-offset (+ 16 demo-option-size))
+(def vision-detect-option-header (get-short navdata 164))
+
+(+ (bit-shift-left (bit-and (nth navdata 19)  0x000000FF) 8)
+  (bit-and (nth navdata 18) 0x000000FF))
+(+ 16 (- (/ demo-option-size 4) 4))
+(+ 28 4) (* 32 4) (/ 148 4)
+(* 10 4)
+(+ 40 4)
+(+ 2 2 4 4 4 4 4 4 4 4 4 4 )
 (/ (Float/intBitsToFloat (Integer. (get-int navdata 28))) 1000)
 (bit-shift-right demo-ctrl-state 16)
 vision-flag

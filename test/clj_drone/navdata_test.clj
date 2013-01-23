@@ -15,11 +15,13 @@
 (def b-demo-pitch [0 96 -122 -60])
 (def b-demo-roll [0 -128 53 -59])
 (def b-demo-yaw [0 0 87 -61])
+(def b-demo-altitude [0 0 0 0])
 (def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
                                   b-demo-control-state b-demo-battery
-                                  b-demo-pitch b-demo-roll b-demo-yaw)))
+                                  b-demo-pitch b-demo-roll b-demo-yaw
+                                  b-demo-altitude)))
 (def header (map byte [-120 119 102 85]))
-(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision))))
+(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option))))
 (def host (InetAddress/getByName "192.168.1.1"))
 (def port 5554)
 (def socket (DatagramSocket. ))
@@ -51,8 +53,7 @@
     option => (contains {:pitch -1.075 })
     option => (contains {:roll -2.904 })
     option => (contains {:yaw -0.215 })
-
-    ))
+    option => (contains {:altitude 0 })))
 
 (fact "about parse-navdata"
   (parse-navdata nav-input) => anything
@@ -61,6 +62,12 @@
   @nav-data => (contains {:flying :landed})
   @nav-data => (contains {:seq-num 870})
   @nav-data => (contains {:vision-flag false})
+  @nav-data => (contains {:control-state :landed})
+  @nav-data => (contains {:battery-percent 100 })
+  @nav-data => (contains {:pitch -1.075 })
+  @nav-data => (contains {:roll -2.904 })
+  @nav-data => (contains {:yaw -0.215 })
+  @nav-data => (contains {:altitude 0 })
   (against-background (before :facts (reset! nav-data {}))))
 
 

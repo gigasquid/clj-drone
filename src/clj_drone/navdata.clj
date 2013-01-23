@@ -78,17 +78,19 @@
   (control-states (bit-shift-right (get-int ba offset) 16)))
 
 (defn parse-demo-option [ba offset]
-  (let [ control-state (parse-control-state ba 4)
-         battery (get-int ba 8)
-         pitch (/ (get-float ba 12) 1000)
-         roll  (/ (get-float ba 16) 1000)
-         yaw   (/ (get-float ba 20) 1000)
+  (let [ control-state (parse-control-state ba (+ offset 4))
+         battery (get-int ba (+ offset 8))
+         pitch (/ (get-float ba (+ offset 12)) 1000)
+         roll  (/ (get-float ba (+ offset 16)) 1000)
+         yaw   (/ (get-float ba (+ offset 20)) 1000)
+         altitude (/ (get-int ba (+ offset 24)) 100)
          ]
     { :control-state control-state
       :battery-percent battery
       :pitch pitch
       :roll roll
-      :yaw yaw}))
+      :yaw yaw
+      :altitude altitude}))
 
 (defn parse-nav-state [state]
   (reduce
@@ -104,8 +106,10 @@
          state (get-int navdata-bytes 4)
          seqnum (get-int navdata-bytes 8)
          vision-flag (= (get-int navdata-bytes 12) 1)
+         pstate (parse-nav-state state)
+         demo-option (parse-demo-option navdata-bytes 16)
          new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
-                         (parse-nav-state state))]
+                          pstate demo-option)]
     (swap! nav-data merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]
