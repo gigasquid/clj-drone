@@ -1,7 +1,8 @@
 (ns clj-drone.example.navigation
   (:use clj-drone.core
         clj-drone.navdata)
-  (:import (java.net DatagramPacket DatagramSocket InetAddress)))
+  (:import (java.net DatagramPacket DatagramSocket InetAddress))
+  (:import (java.lang Float)))
 
 
 
@@ -35,13 +36,27 @@
 (def navdata (.getData nav-datagram-receive-packet))
 
 
-(nth navdata 11)
+(nth navdata 31)
 (def state (get-int navdata 4))
 (def seq-num (get-int navdata 8))
+(def vision-flag (get-int navdata 12))
+(def demo-option-header (get-short navdata 16))
+(def demo-option-size (get-short navdata 18))
+(def demo-ctrl-state (get-int navdata 20))
+(def demo-battery (get-int navdata 24))
+(def demo-pitch (get-int navdata 28))
+(/ (Float/intBitsToFloat (Integer. (get-int navdata 28))) 1000)
+(bit-shift-right demo-ctrl-state 16)
+vision-flag
 (def x (map byte [102 3 0 0]))
 (get-int x 0)
+(get-int (take 4 navdata) 0)
 seq-num
 state
+(parse-navdata navdata)
+(range 4)
+(new Float "12.0")
+(Float/intBitsToFloat 10)
 
 
 

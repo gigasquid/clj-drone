@@ -1,7 +1,8 @@
 (ns clj-drone.navdata
   (require [ clj-logging-config.log4j :as log-config]
            [ clojure.tools.logging :as log])
-(:import (java.net DatagramPacket DatagramSocket InetAddress)))
+  (:import (java.net DatagramPacket DatagramSocket InetAddress))
+  (:import (java.lang Float)))
 
 (log-config/set-logger! :level :debug
                         :out (org.apache.log4j.FileAppender.
@@ -48,15 +49,46 @@
     {:name :emergency          :mask 31 :values [:ok :detected]}
     ])
 
+(def control-states
+  {0 :default, 1 :init, 2 :landed, 3 :flying, 4 :hovering, 5 :test,
+   6 :trans-takeoff, 7 :trans-gotofix, 8 :trans-landing, 9 :trans-looping})
+
+(def option-tags [0 :NAVDATA-DEMO-TAG])
+
 (defn new-datagram-packet [data host port]
   (new DatagramPacket data (count data) host port))
 
-(defn get-int [ba offset]
+(defn bytes-to-int [ba offset num-bytes]
   (let [c 0x000000FF]
     (reduce
       #(+ %1 (bit-shift-left (bit-and (nth ba (+ offset %2)) c) (* 8 %2)))
       0
-      [0 1 2 3])))
+      (range num-bytes))))
+
+(defn get-int [ba offset]
+  (bytes-to-int ba offset 4))
+
+(defn get-short [ba offset]
+  (bytes-to-int ba offset 2))
+
+(defn get-float [ba offset]
+  (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
+
+(defn parse-control-state [ba offset]
+  (control-states (bit-shift-right (get-int ba offset) 16)))
+
+(defn parse-demo-option [ba offset]
+  (let [ control-state (parse-control-state ba 4)
+         battery (get-int ba 8)
+         pitch (/ (get-float ba 12) 1000)
+         roll  (/ (get-float ba 16) 1000)
+         yaw   (/ (get-float ba 20) 1000)
+         ]
+    { :control-state control-state
+      :battery-percent battery
+      :pitch pitch
+      :roll roll
+      :yaw yaw}))
 
 (defn parse-nav-state [state]
   (reduce
@@ -71,7 +103,9 @@
   (let [ header (get-int navdata-bytes 0)
          state (get-int navdata-bytes 4)
          seqnum (get-int navdata-bytes 8)
-         new-data (merge {:header header :seq-num seqnum} (parse-nav-state state))]
+         vision-flag (= (get-int navdata-bytes 12) 1)
+         new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
+                         (parse-nav-state state))]
     (swap! nav-data merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]
@@ -90,7 +124,7 @@
     (log/info (str "Navdata: " @nav-data))
     (if @stop-navstream
       "navstream ended"
-      (stream-navdata socket packet))))
+      (recur socket packet))))
 
 (defn init-streaming-navdata [navdata-socket host port]
   (let [ send-data (byte-array (map byte [1 0 0 0]))

@@ -7,8 +7,19 @@
 (def b-header [-120 119 102 85])
 (def b-state [-48 4 -128 15])
 (def b-seqnum [102 3 0 0])
+(def b-vision [0 0 0 0])
+(def b-demo-option-id [0 0])
+(def b-demo-option-size [-108 0])
+(def b-demo-control-state [0 0 2 0])
+(def b-demo-battery [100 0 0 0])
+(def b-demo-pitch [0 96 -122 -60])
+(def b-demo-roll [0 -128 53 -59])
+(def b-demo-yaw [0 0 87 -61])
+(def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
+                                  b-demo-control-state b-demo-battery
+                                  b-demo-pitch b-demo-roll b-demo-yaw)))
 (def header (map byte [-120 119 102 85]))
-(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum))))
+(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision))))
 (def host (InetAddress/getByName "192.168.1.1"))
 (def port 5554)
 (def socket (DatagramSocket. ))
@@ -24,12 +35,32 @@
 (fact "about get-int"
   (get-int (byte-array header) 0) => 0x55667788)
 
+(fact "about get-short"
+  (get-short (map byte b-demo-option-size) 0) => 148)
+
+(fact "acout get-float"
+  (get-float (map byte b-demo-pitch) 0) => -1075.0)
+
+(fact "about parse-control-state"
+  (parse-control-state b-demo-option 4) => :landed)
+
+(fact "about parse-demo-option"
+  (let [option (parse-demo-option b-demo-option 0)]
+    option => (contains {:control-state :landed})
+    option => (contains {:battery-percent 100 })
+    option => (contains {:pitch -1.075 })
+    option => (contains {:roll -2.904 })
+    option => (contains {:yaw -0.215 })
+
+    ))
+
 (fact "about parse-navdata"
   (parse-navdata nav-input) => anything
   @nav-data => (contains {:header 0x55667788})
   @nav-data => (contains {:battery :ok})
   @nav-data => (contains {:flying :landed})
   @nav-data => (contains {:seq-num 870})
+  @nav-data => (contains {:vision-flag false})
   (against-background (before :facts (reset! nav-data {}))))
 
 
