@@ -7,14 +7,20 @@
 
 
 @nav-data
-(reset! stop-navstream false )
 (reset! nav-data {})
 (drone-initialize)
-(drone-init-navdata)
-(drone :take-off)
+(do 
+  (drone-init-navdata)
+  (drone-do-for 4 :take-off)
+  (drone-do-for 2 :spin-right 0.3)
+  (drone :land)
+  )
 (drone :land)
 @nav-data
+(end-navstream)
+(log-flight-data)
 (drone :reset-watchdog)
+(= :problem (@nav-data :com-watchdog))
 
 
 
@@ -36,7 +42,7 @@
 (def navdata (.getData nav-datagram-receive-packet))
 
 
-(nth navdata 163)
+(nth navdata 175)
 (def state (get-int navdata 4))
 (def seq-num (get-int navdata 8))
 (def vision-flag (get-int navdata 12))
@@ -50,6 +56,9 @@
 (def demo-altitude (get-int navdata 40))
 (def new-offset (+ 16 demo-option-size))
 (def vision-detect-option-header (get-short navdata 164))
+(def vision-detect-option-size (get-short navdata 166))
+(def vision-tag-detected (get-int navdata 168))
+(def vision-type (get-int navdata 172))
 
 (+ (bit-shift-left (bit-and (nth navdata 19)  0x000000FF) 8)
   (bit-and (nth navdata 18) 0x000000FF))

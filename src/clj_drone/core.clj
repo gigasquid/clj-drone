@@ -1,7 +1,17 @@
 (ns clj-drone.core
+  (require [ clj-logging-config.log4j :as log-config]
+           [ clojure.tools.logging :as log])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
   (:use clj-drone.at
         clj-drone.navdata))
+
+(log-config/set-logger! :level :debug
+                        :out (org.apache.log4j.FileAppender.
+                              (org.apache.log4j.EnhancedPatternLayout. org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
+                              "logs/drone.log"
+                               true))
+
+
 
 (def default-drone-ip "192.168.1.1")
 (def default-at-port 5556)
@@ -9,7 +19,6 @@
 (def at-socket (DatagramSocket. ))
 (def navdata-socket (DatagramSocket. ))
 (def counter (atom 0))
-
 (declare drone)
 
 (defn drone-initialize
@@ -41,8 +50,44 @@
 (defn drone-stop-navdata []
   (reset! stop-navstream true))
 
+(defn communication-check []
+  (when (= :problem (@nav-data :com-watchdog))
+    (log/info "Watchdog Reset")
+    (drone :reset-watchdog)))
+
+(defn stream-navdata [socket packet]
+  (do
+    (receive-navdata socket packet)
+    (parse-navdata (get-navdata-bytes packet))
+    (log/info (str "navdata: "(log-flight-data)))
+    (communication-check)
+    (if @stop-navstream
+      (log/info "navstream-ended")
+      (recur socket packet))))
+
+(defn start-streaming-navdata [navdata-socket host port]
+  (let [ receive-data (byte-array 2048)
+         nav-datagram-receive-packet (new-datagram-packet receive-data host port)]
+    (do
+      (.setSoTimeout navdata-socket 1000)
+      (future (stream-navdata navdata-socket nav-datagram-receive-packet)))))
+
+
+(defn init-streaming-navdata [navdata-socket host port]
+  (let [ send-data (byte-array (map byte [1 0 0 0]))
+         nav-datagram-send-packet (new-datagram-packet send-data host port)
+         receive-data (byte-array 2048)
+         nav-datagram-receive-packet (new-datagram-packet receive-data host port)
+         ]
+    (do
+      (reset-navstream)
+      (.setSoTimeout navdata-socket 1000)
+      (send-navdata navdata-socket nav-datagram-send-packet))))
+
+
 (defn drone-init-navdata []
   (do
+    (init-streaming-navdata navdata-socket drone-host navdata-port)
     (drone :init-navdata)
     (drone :control-ack)
-    (init-streaming-navdata navdata-socket drone-host navdata-port)))
+    (start-streaming-navdata navdata-socket drone-host navdata-port)))

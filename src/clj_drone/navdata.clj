@@ -1,18 +1,12 @@
 (ns clj-drone.navdata
-  (require [ clj-logging-config.log4j :as log-config]
-           [ clojure.tools.logging :as log])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
   (:import (java.lang Float)))
-
-(log-config/set-logger! :level :debug
-                        :out (org.apache.log4j.FileAppender.
-                              (org.apache.log4j.EnhancedPatternLayout. org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
-                              "logs/drone.log"
-                               true))
 
 
 (def nav-data (atom {}))
 (def stop-navstream (atom false))
+(defn end-navstream [] (reset! stop-navstream true))
+(defn reset-navstream [] (reset! stop-navstream false))
 
 (def state-masks
   [ {:name :flying             :mask 0  :values [:landed :flying]}
@@ -80,10 +74,10 @@
 (defn parse-demo-option [ba offset]
   (let [ control-state (parse-control-state ba (+ offset 4))
          battery (get-int ba (+ offset 8))
-         pitch (/ (get-float ba (+ offset 12)) 1000)
-         roll  (/ (get-float ba (+ offset 16)) 1000)
-         yaw   (/ (get-float ba (+ offset 20)) 1000)
-         altitude (/ (get-int ba (+ offset 24)) 100)
+         pitch (float (/ (get-float ba (+ offset 12)) 1000))
+         roll  (float (/ (get-float ba (+ offset 16)) 1000))
+         yaw   (float (/ (get-float ba (+ offset 20)) 1000))
+         altitude (float (/ (get-int ba (+ offset 24)) 100))
          ]
     { :control-state control-state
       :battery-percent battery
@@ -121,24 +115,7 @@
 (defn get-navdata-bytes  [datagram-packet]
   (.getData datagram-packet))
 
-(defn stream-navdata [socket packet]
-  (do
-    (receive-navdata socket packet)
-    (parse-navdata (get-navdata-bytes packet))
-    (log/info (str "Navdata: " @nav-data))
-    (if @stop-navstream
-      "navstream ended"
-      (recur socket packet))))
-
-(defn init-streaming-navdata [navdata-socket host port]
-  (let [ send-data (byte-array (map byte [1 0 0 0]))
-         nav-datagram-send-packet (new-datagram-packet send-data host port)
-         receive-data (byte-array 2048)
-         nav-datagram-receive-packet (new-datagram-packet receive-data host port)
-         ]
-    (do
-      (.setSoTimeout navdata-socket 1000)
-      (send-navdata navdata-socket nav-datagram-send-packet)
-      (future (stream-navdata navdata-socket nav-datagram-receive-packet))
-      )))
+(defn log-flight-data []
+  (select-keys @nav-data [:seq-num :pstate :com-watchdog :communication
+                           :control-state :roll :pitch :yaw :altitude]))
 

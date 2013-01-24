@@ -19,7 +19,11 @@
 (def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
                                   b-demo-control-state b-demo-battery
                                   b-demo-pitch b-demo-roll b-demo-yaw
-                                  b-demo-altitude)))
+                              b-demo-altitude)))
+(def b-vision-option-id [16 0])
+(def b-vision-option-size [72 1])
+(def b-vision-tag-detected [0 0 0 0])
+(def b-vision-type [0 0 0 0])
 (def header (map byte [-120 119 102 85]))
 (def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option))))
 (def host (InetAddress/getByName "192.168.1.1"))
