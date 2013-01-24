@@ -6,21 +6,21 @@
 
 
 
+;;; work area not ready for prime time yet
+
 @nav-data
 (reset! nav-data {})
 (drone-initialize)
 (do 
   (drone-init-navdata)
   (drone-do-for 4 :take-off)
-  (drone-do-for 2 :spin-right 0.3)
+  (drone-do-for 4 :spin-right 0.3)
   (drone :land)
   )
 (drone :land)
 @nav-data
 (end-navstream)
-(log-flight-data)
 (drone :reset-watchdog)
-(= :problem (@nav-data :com-watchdog))
 
 
 
@@ -60,25 +60,6 @@
 (def vision-tag-detected (get-int navdata 168))
 (def vision-type (get-int navdata 172))
 
-(+ (bit-shift-left (bit-and (nth navdata 19)  0x000000FF) 8)
-  (bit-and (nth navdata 18) 0x000000FF))
-(+ 16 (- (/ demo-option-size 4) 4))
-(+ 28 4) (* 32 4) (/ 148 4)
-(* 10 4)
-(+ 40 4)
-(+ 2 2 4 4 4 4 4 4 4 4 4 4 )
-(/ (Float/intBitsToFloat (Integer. (get-int navdata 28))) 1000)
-(bit-shift-right demo-ctrl-state 16)
-vision-flag
-(def x (map byte [102 3 0 0]))
-(get-int x 0)
-(get-int (take 4 navdata) 0)
-seq-num
-state
-(parse-navdata navdata)
-(range 4)
-(new Float "12.0")
-(Float/intBitsToFloat 10)
 
 
 

@@ -77,7 +77,7 @@
          pitch (float (/ (get-float ba (+ offset 12)) 1000))
          roll  (float (/ (get-float ba (+ offset 16)) 1000))
          yaw   (float (/ (get-float ba (+ offset 20)) 1000))
-         altitude (float (/ (get-int ba (+ offset 24)) 100))
+         altitude (float (/ (get-int ba (+ offset 24)) 1000))
          ]
     { :control-state control-state
       :battery-percent battery

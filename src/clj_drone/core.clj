@@ -87,6 +87,7 @@
 
 (defn drone-init-navdata []
   (do
+    (reset! nav-data {})
     (init-streaming-navdata navdata-socket drone-host navdata-port)
     (drone :init-navdata)
     (drone :control-ack)

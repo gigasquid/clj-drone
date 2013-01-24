@@ -1,7 +1,8 @@
 (ns clj-drone.navdata-test
   (:use clojure.test
         midje.sweet
-    clj-drone.navdata)
+    clj-drone.navdata
+    clj-drone.core)
   (:import (java.net InetAddress DatagramSocket)))
 
 (def b-header [-120 119 102 85])
@@ -54,10 +55,10 @@
   (let [option (parse-demo-option b-demo-option 0)]
     option => (contains {:control-state :landed})
     option => (contains {:battery-percent 100 })
-    option => (contains {:pitch -1.075 })
-    option => (contains {:roll -2.904 })
-    option => (contains {:yaw -0.215 })
-    option => (contains {:altitude 0 })))
+    option => (contains {:pitch (float -1.075) })
+    option => (contains {:roll (float -2.904) })
+    option => (contains {:yaw (float -0.215) })
+    option => (contains {:altitude  (float 0.0) })))
 
 (fact "about parse-navdata"
   (parse-navdata nav-input) => anything
@@ -68,10 +69,10 @@
   @nav-data => (contains {:vision-flag false})
   @nav-data => (contains {:control-state :landed})
   @nav-data => (contains {:battery-percent 100 })
-  @nav-data => (contains {:pitch -1.075 })
-  @nav-data => (contains {:roll -2.904 })
-  @nav-data => (contains {:yaw -0.215 })
-  @nav-data => (contains {:altitude 0 })
+  @nav-data => (contains {:pitch (float -1.075) })
+  @nav-data => (contains {:roll (float -2.904) })
+  @nav-data => (contains {:yaw (float -0.215) })
+  @nav-data => (contains {:altitude (float 0.0) })
   (against-background (before :facts (reset! nav-data {}))))
 
 
