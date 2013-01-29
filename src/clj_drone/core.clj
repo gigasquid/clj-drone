@@ -3,15 +3,13 @@
            [ clojure.tools.logging :as log])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
   (:use clj-drone.at
-        clj-drone.navdata))
+    clj-drone.navdata))
 
 (log-config/set-logger! :level :debug
                         :out (org.apache.log4j.FileAppender.
                               (org.apache.log4j.EnhancedPatternLayout. org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
                               "logs/drone.log"
-                               true))
-
-
+                              true))
 
 (def default-drone-ip "192.168.1.1")
 (def default-at-port 5556)
@@ -27,8 +25,9 @@
     (def drone-host (InetAddress/getByName ip))
     (def at-port at-port)
     (def navdata-port navdata-port)
-    (reset! counter 0)
-    (drone :flat-trim)))
+    (do (reset! counter 0)
+      (drone :flat-trim)
+      (log/info "Initializing Drone ..."))))
 
 (defn send-command
   ([data] (send-command data at-socket))
@@ -69,6 +68,7 @@
   (let [ receive-data (byte-array 2048)
          nav-datagram-receive-packet (new-datagram-packet receive-data host port)]
     (do
+      (log/info "Starting navdata stream")
       (.setSoTimeout navdata-socket 1000)
       (future (stream-navdata navdata-socket nav-datagram-receive-packet)))))
 
@@ -87,8 +87,10 @@
 
 (defn drone-init-navdata []
   (do
+    (log/info "Initializing navdata")
     (reset! nav-data {})
     (init-streaming-navdata navdata-socket drone-host navdata-port)
     (drone :init-navdata)
     (drone :control-ack)
+    (init-streaming-navdata navdata-socket drone-host navdata-port)
     (start-streaming-navdata navdata-socket drone-host navdata-port)))

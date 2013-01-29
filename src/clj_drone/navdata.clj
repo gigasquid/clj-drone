@@ -5,8 +5,11 @@
 
 (def nav-data (atom {}))
 (def stop-navstream (atom false))
+(def log-data (atom [:seq-num :pstate :com-watchdog :communication
+                           :control-state :roll :pitch :yaw :altitude]))
 (defn end-navstream [] (reset! stop-navstream true))
 (defn reset-navstream [] (reset! stop-navstream false))
+(defn set-log-data [data] (reset! log-data data))
 
 (def state-masks
   [ {:name :flying             :mask 0  :values [:landed :flying]}
@@ -116,6 +119,5 @@
   (.getData datagram-packet))
 
 (defn log-flight-data []
-  (select-keys @nav-data [:seq-num :pstate :com-watchdog :communication
-                           :control-state :roll :pitch :yaw :altitude]))
+  (select-keys @nav-data @log-data))
 
