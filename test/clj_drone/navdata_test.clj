@@ -17,10 +17,14 @@
 (def b-demo-roll [0 -128 53 -59])
 (def b-demo-yaw [0 0 87 -61])
 (def b-demo-altitude [0 0 0 0])
+(def b-demo-velocity-x [0 0 0 0])
+(def b-demo-velocity-y [0 0 0 0])
+(def b-demo-velocity-z [0 0 0 0])
 (def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
                                   b-demo-control-state b-demo-battery
                                   b-demo-pitch b-demo-roll b-demo-yaw
-                              b-demo-altitude)))
+                                  b-demo-altitude b-demo-velocity-x
+                                  b-demo-velocity-y b-demo-velocity-z)))
 (def b-vision-option-id [16 0])
 (def b-vision-option-size [72 1])
 (def b-vision-tag-detected [0 0 0 0])
@@ -58,7 +62,11 @@
     option => (contains {:pitch (float -1.075) })
     option => (contains {:roll (float -2.904) })
     option => (contains {:yaw (float -0.215) })
-    option => (contains {:altitude  (float 0.0) })))
+    option => (contains {:altitude  (float 0.0) })
+    option => (contains {:velocity-x  (float 0.0) })
+    option => (contains {:velocity-y  (float 0.0) })
+    option => (contains {:velocity-z  (float 0.0) })
+    ))
 
 (fact "about parse-navdata"
   (parse-navdata nav-input) => anything
@@ -73,6 +81,9 @@
   @nav-data => (contains {:roll (float -2.904) })
   @nav-data => (contains {:yaw (float -0.215) })
   @nav-data => (contains {:altitude (float 0.0) })
+  @nav-data => (contains {:velocity-x (float 0.0)})
+  @nav-data => (contains {:velocity-y (float 0.0)})
+  @nav-data => (contains {:velocity-z (float 0.0)})
   (against-background (before :facts (reset! nav-data {}))))
 
 

@@ -81,13 +81,20 @@
          roll  (float (/ (get-float ba (+ offset 16)) 1000))
          yaw   (float (/ (get-float ba (+ offset 20)) 1000))
          altitude (float (/ (get-int ba (+ offset 24)) 1000))
+         velocity-x (float (get-float ba (+ offset 28)))
+         velocity-y (float (get-float ba (+ offset 32)))
+         velocity-z (float (get-float ba (+ offset 26)))
          ]
     { :control-state control-state
       :battery-percent battery
       :pitch pitch
       :roll roll
       :yaw yaw
-      :altitude altitude}))
+      :altitude altitude
+      :velocity-x velocity-x
+      :velocity-y velocity-y
+      :velocity-z velocity-z
+      }))
 
 (defn parse-nav-state [state]
   (reduce

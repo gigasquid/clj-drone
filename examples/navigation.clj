@@ -6,11 +6,13 @@
 
 
 
+
 ;;; work area not ready for prime time yet
 
 @nav-data
 (reset! nav-data {})
 (drone-initialize)
+(init)
 (do 
   (drone-init-navdata)
   (drone-do-for 4 :take-off)
@@ -21,6 +23,8 @@
 @nav-data
 (end-navstream)
 (drone :reset-watchdog)
+(drone :emergency)
+(drone :flat-trim)
 
 
 
@@ -54,6 +58,9 @@
 (def demo-roll (get-float navdata 32))
 (def demo-yaw (get-float navdata 36))
 (def demo-altitude (get-int navdata 40))
+(def demo-velocity-x (get-int navdata 44))
+(def demo-velocity-y (get-int navdata 48))
+(def demo-velocity-z (get-int navdata 52))
 (def new-offset (+ 16 demo-option-size))
 (def vision-detect-option-header (get-short navdata 164))
 (def vision-detect-option-size (get-short navdata 166))

@@ -70,7 +70,9 @@
     (do
       (log/info "Starting navdata stream")
       (.setSoTimeout navdata-socket 1000)
-      (future (stream-navdata navdata-socket nav-datagram-receive-packet)))))
+      (future (stream-navdata navdata-socket
+                nav-datagram-receive-packet))
+      (log/info "Creating navdata stream" )))
 
 
 (defn init-streaming-navdata [navdata-socket host port]
@@ -93,4 +95,6 @@
     (drone :init-navdata)
     (drone :control-ack)
     (init-streaming-navdata navdata-socket drone-host navdata-port)
-    (start-streaming-navdata navdata-socket drone-host navdata-port)))
+    (start-streaming-navdata navdata-socket drone-host navdata-port)
+    ;(Thread/sleep 3000) ;Delay to let the logging catch up
+    ))
