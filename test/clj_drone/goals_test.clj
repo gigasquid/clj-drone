@@ -9,7 +9,13 @@
 (def-belief-action ba1 "belief 1" belief-fn1 action-fn1)
 (def-belief-action ba2 "belief 2" belief-fn2 action-fn1)
 (defn goal-fn1 [] (= 2 2))
+(defn goal-fn2 [] (= 2 3))
 (def-goal g1 "goal 1" goal-fn1 [ba1 ba2])
+(def-goal g2 "goal 2" goal-fn2 [ba1 ba2])
+
+(defn reset-beliefs-goals []
+  (reset! current-belief "None")
+  (reset! current-goal "None"))
 
 (fact "about def-belief-action"
   (let [ belief-str "I am on the ground"
@@ -35,10 +41,17 @@
 (fact "eval-belief-action will not execute action if the belief-fn is false"
   (eval-belief-action ba2) => nil
   @current-belief => "None"
-  (against-background (before :facts (reset! current-belief "None"))))
+  (against-background (before :facts (reset-beliefs-goals))))
 
-(fact "eval-goal will execute the action if the goal is true"
-  (eval-goal g1) => "Goal Reached"
+(fact "about eval-goal when the goal has been reached"
+  (eval-goal g1) => :goal-reached
+  @current-belief => "None"
+  @current-goal => "goal 1"
+  (against-background (before :facts (reset-beliefs-goals))))
+
+(fact "about eval-goal when the goal has not been reached"
+  (eval-goal g2) => nil
   @current-belief => "belief 1"
-  @current-goal => "goal 1")
+  @current-goal => "goal 2"
+  (against-background (before :facts (reset-beliefs-goals))))
 

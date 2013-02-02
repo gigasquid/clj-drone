@@ -72,7 +72,7 @@
       (.setSoTimeout navdata-socket 1000)
       (future (stream-navdata navdata-socket
                 nav-datagram-receive-packet))
-      (log/info "Creating navdata stream" )))
+      (log/info "Creating navdata stream" ))))
 
 
 (defn init-streaming-navdata [navdata-socket host port]
