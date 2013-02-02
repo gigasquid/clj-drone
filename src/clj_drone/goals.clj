@@ -24,3 +24,8 @@
       :goal-reached
       (doseq [ba belief-actions]
         (eval-belief-action ba))))
+
+(defn eval-goal-list [goal-list]
+  (if (= :goal-reached (eval-goal (first goal-list)))
+      (rest goal-list)
+      goal-list))

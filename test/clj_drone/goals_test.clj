@@ -12,6 +12,7 @@
 (defn goal-fn2 [] (= 2 3))
 (def-goal g1 "goal 1" goal-fn1 [ba1 ba2])
 (def-goal g2 "goal 2" goal-fn2 [ba1 ba2])
+(def-goal g3 "goal 3" goal-fn2 [ba1 ba2])
 
 (defn reset-beliefs-goals []
   (reset! current-belief "None")
@@ -53,5 +54,18 @@
   (eval-goal g2) => nil
   @current-belief => "belief 1"
   @current-goal => "goal 2"
+  (against-background (before :facts (reset-beliefs-goals))))
+
+(fact "eval-goal-list returns the same goal list if first goal has not been reached"
+  (eval-goal-list [g2 g3]) => [g2 g3]
+  @current-belief => "belief 1"
+  @current-goal => "goal 2"
+  (against-background (before :facts (reset-beliefs-goals))))
+
+
+(fact "eval-goal-list returns the rest of the goal list if first goal has been reached"
+  (eval-goal-list [g1 g2 g3]) => [g2 g3]
+  @current-belief => "None"
+  @current-goal => "goal 1"
   (against-background (before :facts (reset-beliefs-goals))))
 
