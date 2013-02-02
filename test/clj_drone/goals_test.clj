@@ -56,6 +56,9 @@
   @current-goal => "goal 2"
   (against-background (before :facts (reset-beliefs-goals))))
 
+(fact "eval-goal handles a nil goal"
+  (eval-goal nil) => nil)
+
 (fact "eval-goal-list returns the same goal list if first goal has not been reached"
   (eval-goal-list [g2 g3]) => [g2 g3]
   @current-belief => "belief 1"
@@ -68,4 +71,10 @@
   @current-belief => "None"
   @current-goal => "goal 1"
   (against-background (before :facts (reset-beliefs-goals))))
+
+(fact "eval-goal-list handles nil and  an empty list"
+  (eval-goal-list nil) => nil
+  (eval-goal-list []) => [])
+
+
 
