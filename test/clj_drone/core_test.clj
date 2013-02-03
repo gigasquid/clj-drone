@@ -2,11 +2,11 @@
   (:import (java.net DatagramPacket))
   (:require [clojure.test :refer :all]
             [midje.sweet :refer :all]
-            [clj-drone.core :refer :all]
-            [clj-drone.at :refer :all]))
+            [clj-drone.core :refer :all]))
 
 (deftest core-tests
-  (fact "default initialize gets default host and port"
+  (facts "default initialize gets default host and port"
+        (drone-initialize) => nil
         (.getHostName drone-host) => default-drone-ip
         at-port => default-at-port
         navdata-port => default-navdata-port

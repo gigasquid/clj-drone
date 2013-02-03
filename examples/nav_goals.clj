@@ -4,6 +4,7 @@
             [clj-drone.goals :refer :all]))
 
 
+
 (set-log-data [:seq-num :control-state :altitude])
 
 (def-belief-action ba-landed
@@ -12,8 +13,8 @@
   (fn [navdata] (drone :take-off)))
 
 (def-belief-action ba-hovering
-  "I am hovering"
-  (fn [{:keys [control-state]}] (= control-state :hovering))
+  "I am taking off"
+  (fn [{:keys [control-state]}] (= control-state ::trans-takeoff))
   nil)
 
 (def-goal g-take-off
@@ -24,9 +25,11 @@
 
 (set-current-goal-list [g-take-off])
 
-
+@current-goal-list
 (drone-initialize)
 (drone-init-navdata)
+@nav-data
 (drone :land)
-(end-navstream)
-(drone :emergency)
+;(end-navstream)
+
+

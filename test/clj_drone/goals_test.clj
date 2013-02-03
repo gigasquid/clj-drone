@@ -52,7 +52,7 @@
 
 (fact "about eval-goal when the goal has been reached"
       (eval-goal g1 {}) => :goal-reached
-      @current-belief => "None"
+      @current-belief => "Achieved goal: goal 1"
       @current-goal => "goal 1"
       (against-background (before :facts (reset-beliefs-goals))))
 
@@ -73,7 +73,7 @@
 
 (fact "eval-goal-list returns the rest of the goal list if first goal has been reached"
       (eval-goal-list [g1 g2 g3] {}) => [g2 g3]
-      @current-belief => "None"
+      @current-belief => "Achieved goal: goal 1"
       @current-goal => "goal 1"
       (against-background (before :facts (reset-beliefs-goals))))
 

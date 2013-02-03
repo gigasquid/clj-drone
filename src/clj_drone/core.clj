@@ -1,10 +1,10 @@
 (ns clj-drone.core
-  (require [ clj-logging-config.log4j :as log-config]
-           [ clojure.tools.logging :as log])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
-  (:require [clj-drone.at :refer :all]
-            [clj-drone.navdata :refer :all]
-            [clj-drone.goals :refer :all]))
+  (:require  [ clj-logging-config.log4j :as log-config]
+             [ clojure.tools.logging :as log]
+             [clj-drone.at :refer :all]
+             [clj-drone.navdata :refer :all]
+             [clj-drone.goals :refer :all]))
 
 
 (def default-drone-ip "192.168.1.1")
@@ -17,10 +17,8 @@
 
 (defn init-logger []
   (log-config/set-logger! :level :debug
-                          :out (org.apache.log4j.FileAppender.
-                                (org.apache.log4j.EnhancedPatternLayout. org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
-                                "logs/drone.log"
-                                true)))
+                          :out "logs/drone.log"))
+(init-logger)
 
 (defn drone-initialize
   ([] (drone-initialize default-drone-ip default-at-port default-navdata-port))
@@ -102,6 +100,4 @@
     (drone :init-navdata)
     (drone :control-ack)
     (init-streaming-navdata navdata-socket drone-host navdata-port)
-    (start-streaming-navdata navdata-socket drone-host navdata-port)
-                                        ;(Thread/sleep 3000) ;Delay to let the logging catch up
-    ))
+    (start-streaming-navdata navdata-socket drone-host navdata-port)))

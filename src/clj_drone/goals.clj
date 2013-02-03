@@ -23,7 +23,9 @@
   (when goal
     (reset! current-goal goal-str)
     (if (goal navdata)
-      :goal-reached
+      (do
+        (reset! current-belief (str "Achieved goal: " goal-str))
+        :goal-reached)
       (doseq [ba belief-actions]
         (eval-belief-action ba navdata)))))
 
