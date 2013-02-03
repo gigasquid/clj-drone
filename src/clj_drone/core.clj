@@ -3,7 +3,8 @@
            [ clojure.tools.logging :as log])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
   (:use clj-drone.at
-    clj-drone.navdata))
+        clj-drone.navdata
+        clj-drone.goals))
 
 (log-config/set-logger! :level :debug
                         :out (org.apache.log4j.FileAppender.
@@ -59,7 +60,10 @@
     (receive-navdata socket packet)
     (parse-navdata (get-navdata-bytes packet))
     (log/info (str "navdata: "(log-flight-data)))
+    (log/info "hey")
     (communication-check)
+    (eval-current-goals @nav-data)
+    (log/info (log-goal-info))
     (if @stop-navstream
       (log/info "navstream-ended")
       (recur socket packet))))
@@ -71,7 +75,7 @@
       (log/info "Starting navdata stream")
       (.setSoTimeout navdata-socket 1000)
       (future (stream-navdata navdata-socket
-                nav-datagram-receive-packet))
+                       nav-datagram-receive-packet))
       (log/info "Creating navdata stream" ))))
 
 
