@@ -1,6 +1,6 @@
 (ns clj-drone.example.navtest
-  (:use clj-drone.core
-        clj-drone.navdata))
+  (:require [clj-drone.core :refer :all]
+            [clj-drone.navdata :refer :all]))
 
 
 (set-log-data [:seq-num :flying :battery-percent :control-state :roll :pitch :yaw

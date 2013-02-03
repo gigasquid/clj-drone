@@ -1,5 +1,5 @@
 (ns clj-drone.example.moves
-  (:use clj-drone.core))
+  (:require [clj-drone.core :refer :all]))
 
 (drone-initialize)
 ;Use ip and port for non-standard drone ip/port

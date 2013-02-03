@@ -1,6 +1,6 @@
 (ns clj-drone.example.navigation
-  (:use clj-drone.core
-        clj-drone.navdata)
+  (:require [clj-drone.core :refer :all]
+            [clj-drone.navdata :refer :all])
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
   (:import (java.lang Float)))
 

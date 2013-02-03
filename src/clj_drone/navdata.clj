@@ -6,7 +6,7 @@
 (def nav-data (atom {}))
 (def stop-navstream (atom false))
 (def log-data (atom [:seq-num :pstate :com-watchdog :communication
-                           :control-state :roll :pitch :yaw :altitude]))
+                     :control-state :roll :pitch :yaw :altitude]))
 (defn end-navstream [] (reset! stop-navstream true))
 (defn reset-navstream [] (reset! stop-navstream false))
 (defn set-log-data [data] (reset! log-data data))
@@ -58,9 +58,9 @@
 (defn bytes-to-int [ba offset num-bytes]
   (let [c 0x000000FF]
     (reduce
-      #(+ %1 (bit-shift-left (bit-and (nth ba (+ offset %2)) c) (* 8 %2)))
-      0
-      (range num-bytes))))
+     #(+ %1 (bit-shift-left (bit-and (nth ba (+ offset %2)) c) (* 8 %2)))
+     0
+     (range num-bytes))))
 
 (defn get-int [ba offset]
   (bytes-to-int ba offset 4))
@@ -76,44 +76,44 @@
 
 (defn parse-demo-option [ba offset]
   (let [ control-state (parse-control-state ba (+ offset 4))
-         battery (get-int ba (+ offset 8))
-         pitch (float (/ (get-float ba (+ offset 12)) 1000))
-         roll  (float (/ (get-float ba (+ offset 16)) 1000))
-         yaw   (float (/ (get-float ba (+ offset 20)) 1000))
-         altitude (float (/ (get-int ba (+ offset 24)) 1000))
-         velocity-x (float (get-float ba (+ offset 28)))
-         velocity-y (float (get-float ba (+ offset 32)))
-         velocity-z (float (get-float ba (+ offset 26)))
-         ]
+        battery (get-int ba (+ offset 8))
+        pitch (float (/ (get-float ba (+ offset 12)) 1000))
+        roll  (float (/ (get-float ba (+ offset 16)) 1000))
+        yaw   (float (/ (get-float ba (+ offset 20)) 1000))
+        altitude (float (/ (get-int ba (+ offset 24)) 1000))
+        velocity-x (float (get-float ba (+ offset 28)))
+        velocity-y (float (get-float ba (+ offset 32)))
+        velocity-z (float (get-float ba (+ offset 26)))
+        ]
     { :control-state control-state
-      :battery-percent battery
-      :pitch pitch
-      :roll roll
-      :yaw yaw
-      :altitude altitude
-      :velocity-x velocity-x
-      :velocity-y velocity-y
-      :velocity-z velocity-z
-      }))
+     :battery-percent battery
+     :pitch pitch
+     :roll roll
+     :yaw yaw
+     :altitude altitude
+     :velocity-x velocity-x
+     :velocity-y velocity-y
+     :velocity-z velocity-z
+     }))
 
 (defn parse-nav-state [state]
   (reduce
-    #(let  [{:keys [name mask values]} %2
-             bvalue (bit-and state (bit-shift-left 1 mask))]
-       (conj %1 {name
-                  (if (= 0 bvalue) (first values) (last values))}))
-    {}
-    state-masks))
+   #(let  [{:keys [name mask values]} %2
+           bvalue (bit-and state (bit-shift-left 1 mask))]
+      (conj %1 {name
+                (if (= 0 bvalue) (first values) (last values))}))
+   {}
+   state-masks))
 
 (defn parse-navdata [navdata-bytes]
   (let [ header (get-int navdata-bytes 0)
-         state (get-int navdata-bytes 4)
-         seqnum (get-int navdata-bytes 8)
-         vision-flag (= (get-int navdata-bytes 12) 1)
-         pstate (parse-nav-state state)
-         demo-option (parse-demo-option navdata-bytes 16)
-         new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
-                          pstate demo-option)]
+        state (get-int navdata-bytes 4)
+        seqnum (get-int navdata-bytes 8)
+        vision-flag (= (get-int navdata-bytes 12) 1)
+        pstate (parse-nav-state state)
+        demo-option (parse-demo-option navdata-bytes 16)
+        new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
+                        pstate demo-option)]
     (swap! nav-data merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]
