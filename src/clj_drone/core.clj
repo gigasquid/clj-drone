@@ -60,7 +60,6 @@
     (receive-navdata socket packet)
     (parse-navdata (get-navdata-bytes packet))
     (log/info (str "navdata: "(log-flight-data)))
-    (log/info "hey")
     (communication-check)
     (eval-current-goals @nav-data)
     (log/info (log-goal-info))

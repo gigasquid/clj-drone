@@ -45,5 +45,5 @@
 
 (defn log-goal-info []
   (str "goal list: " (log-goal-list @current-goal-list)
-       "current-goal: " @current-goal
+       " current-goal: " @current-goal
        " current-belief: " @current-belief))
