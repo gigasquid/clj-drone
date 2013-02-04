@@ -3,8 +3,6 @@
             [clj-drone.navdata :refer :all]
             [clj-drone.goals :refer :all]))
 
-
-
 (set-log-data [:seq-num :control-state :altitude])
 
 (def-belief-action ba-landed
@@ -46,7 +44,6 @@
   "I want to land"
   (fn [{:keys [control-state]}] (= control-state :landed))
   [ba-flying ba-landing])
-
 
 
 (set-current-goal-list [g-take-off g-cruising-altitude g-land])

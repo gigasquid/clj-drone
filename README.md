@@ -29,7 +29,7 @@ Sample Usage - Drone Takes off for 10 seconds and then lands
 (drone :land)
 ```
 
-## Commands Supported
+## Movement Commands Supported
 
 ```clojure
 (drone :take-off)
@@ -73,8 +73,88 @@ number gets out of sync.  It will ignore commands that come in with a bad or out
 (drone :reset-watchdog)
 ````
 
+## Navigation Data
+To start receiving the navigation data, you must issue the command.
+````clojure
+(drone-init-navdata)
+```
+This will start a log in logs/drone.log that will record the
+navigation data for you.  You can control what is printed out to the
+log with:
+```clojure
+(set-log-data [nav-data-keys])
+```
+Example:
+````clojure
+(set-log-data [:seq-num :flying :battery-percent :control-state :roll :pitch :yaw
+                :velocity-x :velocity-y :velocity-z])
+```
+The Navigation Data is stored in a atom that is a map.  You can
+de-reference with:
+````clojure
+@nav-data
+```
+The possible values are:
+````clojure
+;;General State Info
+
+:flying ;=> :landed or :flying
+:video  ;=> :off or :on
+:vision ;=> :off or :on
+:control ;=> :euler-angles or :angular-speed
+:altitude-control ;=> :off or :on
+:user-feedback ;=> :off or :on
+:command-ack ;=> :none or :received
+:camera ;=> :not-ready or :ready
+:travelling ;=> :off or :on
+:usb ;=> :not-ready or :ready
+:demo ;=> :off or :on
+:bootstrap ;=> :off or :on
+:motors ;=> :ok or :motor-problem
+:communication ;=> :ok or :communication-lost
+:software ;=> :ok or :sofware-fault
+:battery ;=> :ok or :too-low
+:emergency-landing ;=> :off or :on
+:timer ;=> :not-elapsed or :elapsed
+:magneto ;=> :ok or :needs-calibration
+:angles ;=> :ok or :out-of-range
+:wind ;=> :ok or :too-much
+:ultrasound ;=> :ok or :deaf
+:cutout ;=> :ok or :detected
+:pic-version ;=> :bad-version or :ok
+:atcodec-thread ;=> :off or :on
+:navdata-thread ;=> :off or :on
+:video-thread ;=> :off or :on
+:acquistion-thread ;=> :off or :on
+:ctrl-watchdog ;=> :ok or :delay
+:adc-watchdog ;=> :ok or :delay
+:com-watchdog ;=> :ok or :problem
+:emergency ;=> :ok or :detected
+
+;;Demo Options
+:control-state ;=> possible values [:default :init :flying :hovering :test :trans-takeoff :trans-gotofix :trans-landing :trans-looping]
+:battery-percent ;=> value between 0 - 1
+:pitch ;=> in degrees
+:roll ;=> in degrees
+:yaw :=> in degrees
+:altitude ;=> in meters
+:velocity-x
+:velocity-y
+:velocity-z
+```
+
+The nav stream will keep going unless interrupted or called to end by
+giving the command
+````clojure
+(end-navstream)
+```
+
+
+
+
 ## To do list
-- incoming navigation data stream
+- incoming navigation stream targets
+- incoming navigation stream angles
 - incoming video stream
 
 ## License

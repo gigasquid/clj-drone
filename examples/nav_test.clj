@@ -1,4 +1,4 @@
-(ns clj-drone.example.navtest
+(ns clj-drone.example.nav-test
   (:require [clj-drone.core :refer :all]
             [clj-drone.navdata :refer :all]))
 
