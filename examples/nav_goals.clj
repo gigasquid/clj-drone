@@ -14,7 +14,7 @@
 
 (def-belief-action ba-taking-off
   "I am taking off"
-  (fn [{:keys [control-state]}] (= control-state ::trans-takeoff))
+  (fn [{:keys [control-state]}] (= control-state :trans-takeoff))
   nil)
 
 (def-goal g-take-off
