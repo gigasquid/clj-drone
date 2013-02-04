@@ -10,3 +10,4 @@ pom.xml
 .lein-plugins
 logs/drone.log
 drone.log
+examples/nav_debug.clj

@@ -3,6 +3,8 @@
             [clj-drone.navdata :refer :all]
             [clj-drone.goals :refer :all]))
 
+;Logging goes to logs/drone.log
+
 (set-log-data [:seq-num :control-state :altitude])
 
 (def-belief-action ba-landed
@@ -45,16 +47,12 @@
   (fn [{:keys [control-state]}] (= control-state :landed))
   [ba-flying ba-landing])
 
-
 (set-current-goal-list [g-take-off g-cruising-altitude g-land])
 
 (drone-initialize)
 (drone-init-navdata)
-(end-navstream)
-;(@nav-data :battery-level)
-;(drone :land)
-;(drone :emergency)
-;(drone :flat-trim)
+;(end-navstream)  If running in the repl end the nav-stream when done
+
 
 
 

@@ -148,8 +148,69 @@ giving the command
 ````clojure
 (end-navstream)
 ```
+Example Program to log navigation data for a flight
+````clojure
+(ns clj-drone.example.nav-test
+  (:require [clj-drone.core :refer :all]
+            [clj-drone.navdata :refer :all]))
 
+;; logging is configured to go to the logs/drone.log file
 
+(set-log-data [:seq-num :flying :battery-percent :control-state :roll :pitch :yaw
+                :velocity-x :velocity-y :velocity-z])
+(drone-initialize)
+(drone-init-navdata)
+(drone :take-off)
+(Thread/sleep 10000)
+(drone :land)
+(end-navstream)
+````
+
+## Auto Navigation with Goals and Beliefs
+Why shouldn't the AR drone have goals and beliefs?
+Inspired by John McCarthy's
+[Ascribing Mental Qualities to Machines](http://www-formal.stanford.edu/jmc/ascribing/ascribing.html)
+, the AR drone can execute behavoir based on defined goals and beliefs
+and log its progress in the drone.log.  The way it works is the
+function that continually processes the navigation input, looks at the
+atom that holds the list of the current goals.  Currently, the drone
+processes these goals one at a time.  That is it will not process the
+second goal in the list until the first goal completes.
+
+### Defining belief-actions
+Belief-actions are defined using the def-belief-action macro.  It
+takes a readable str for the belief, a predicate function of the
+nav-data map to see if it "believes" the statement or not.  Finally,
+it takes another function of the nav-data map to define what the
+action it should take is, if it holds the belief to be true. Example:
+````clojure
+(def-belief-action ba-landed
+  "I am landed"
+  (fn [{:keys [control-state]}] (= control-state :landed))
+  (fn [navdata] (drone :take-off)))
+````
+
+### Defining belief-goals
+Goals are defined using the def-goal macro. It takes a readable str
+for the goal, a predicate function of the nav-data map to see if the
+goal has been reached.  Finally it takes a vector of belief actions
+that it evaluates until the goal has been reached. Example:
+````clojure
+(def-goal g-take-off
+  "I want to fly."
+  (fn [{:keys [control-state]}] (= control-state :hovering))
+  [ba-landed ba-taking-off])
+```
+
+### Setting the current goals
+The list of current goals is set via function set-current-goal-list.
+The current-goal-list is an atom, so the goals can be changed mid
+flight and immediately communicated to the navigation thread. Example:
+````clojure
+(set-current-goal-list [g-take-off g-cruising-altitude g-land])
+```
+
+For a further example of navigation goal processing, see [example/nav-goals](https://github.com/gigasquid/clj-drone/blob/master/examples/nav_goals.clj)
 
 
 ## To do list
