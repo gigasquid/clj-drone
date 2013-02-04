@@ -14,7 +14,7 @@ Using with Leiningen
 ```clojure
 (defproject your-project "0.1.0-SNAPSHOT"
   :description "Your project"
-  :dependencies [[clj-drone "0.1.0-SNAPSHOT"]])
+  :dependencies [[clj-drone "0.1.1"]])
 ````
 
 Sample Usage - Drone Takes off for 10 seconds and then lands
