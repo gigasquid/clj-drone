@@ -136,7 +136,7 @@ The possible values are:
 :battery-percent ;=> value between 0 - 1
 :pitch ;=> in degrees
 :roll ;=> in degrees
-:yaw :=> in degrees
+:yaw ;=> in degrees
 :altitude ;=> in meters
 :velocity-x
 :velocity-y
