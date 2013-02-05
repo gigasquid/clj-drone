@@ -8,7 +8,7 @@
 (defn action-fn1 [navdata] (str "My first action fn"))
 (def-belief-action ba1 "belief 1" belief-fn1 action-fn1)
 (def-belief-action ba2 "belief 2" belief-fn2 action-fn1)
-(def-belief-action ba3 "belief 3" belief-fn2 nil)
+(def-belief-action ba3 "belief 3" belief-fn1 nil)
 (defn goal-fn1 [navdata] (= 2 2))
 (defn goal-fn2 [navdata] (= 2 3))
 (def-goal g1 "goal 1" goal-fn1 [ba1 ba2])

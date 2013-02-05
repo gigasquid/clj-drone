@@ -17,7 +17,7 @@
 (defn eval-belief-action [{:keys [belief-str belief action]} navdata]
   (when (belief navdata)
     (reset! current-belief belief-str)
-    (action navdata)))
+    (when action (action navdata))))
 
 (defn eval-goal [{:keys [goal-str goal belief-actions]} navdata]
   (when goal
