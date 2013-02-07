@@ -6,9 +6,11 @@ A Clojure library to control the Parrot AR Drone 2.0 [http://ardrone2.parrot.com
 
 ## Usage
 
-Just beginning the start of the control library,so far only movement
-commands are supported
+Just beginning the start of the control library
 More to come soon.
+
+If you are interested in seeing some demo videos, check out the
+[blog post](http://gigasquidsoftware.com/wordpress/?p=645).
 
 Using with Leiningen
 ```clojure
