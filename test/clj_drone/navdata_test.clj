@@ -29,6 +29,8 @@
 (def b-vision-option-size [72 1])
 (def b-vision-tag-detected [0 0 0 0])
 (def b-vision-type [0 0 0 0])
+(def b-vision-xc [0 0 0 0])
+(def b-vision-yc [0 0 0 0])
 (def header (map byte [-120 119 102 85]))
 (def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option))))
 (def host (InetAddress/getByName "192.168.1.1"))
@@ -139,3 +141,7 @@
         com-watchdog => :ok
         emergency => :ok
         ))
+
+(fact "about which-option-type"
+      (which-option-type 0) => :demo
+      (which-option-type 16) => :vision-detect)

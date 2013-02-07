@@ -71,6 +71,9 @@
 (defn get-float [ba offset]
   (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
 
+(defn which-option-type [int]
+  (if (= int 0) :demo :vision-detect))
+
 (defn parse-control-state [ba offset]
   (control-states (bit-shift-right (get-int ba offset) 16)))
 
