@@ -89,5 +89,5 @@
       (log-goal-list [g1 g2 g3]) => "goal 1, goal 2, goal 3")
 
 (fact "about log-goal-info"
-      (log-goal-info) => "goal list: current-goal: None current-belief: None"
+      (log-goal-info) => "goal list:  current-goal: None current-belief: None"
       (against-background (before :facts (reset-beliefs-goals))))
