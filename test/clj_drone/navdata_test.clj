@@ -35,12 +35,12 @@
 (def b-target-height [0 0 0 0])
 (def b-target-dist [0 0 0 0])
 (def b-target-orient-angle [0 0 0 0])
-(def b-rotation [0 0 0 0])
-(def b-translation [0 0 0 0])
-(def b-camera-source [0 0 0 0])
+(def b-target-rotation [0 0 0 0])
+(def b-target-translation [0 0 0 0])
+(def b-target-camera-source [0 0 0 0])
 (def b-target-tag (flatten (conj b-target-type b-target-xc b-target-yc
                                  b-target-width b-target-height b-target-dist
-                                 b-target-orient-angle b-rotation b-translation
+                                 b-target-orient-angle b-target-rotation b-target-translation
                                  b-target-camera-source)))
 (def b-target-option (flatten (conj b-target-option-id b-target-option-size
                                     b-target-num-tags-detected
@@ -90,7 +90,7 @@
       @nav-data => (contains {:battery :ok})
       @nav-data => (contains {:flying :landed})
       @nav-data => (contains {:seq-num 870})
-      @nav-data => (contains {:target-flag false})
+      @nav-data => (contains {:vision-flag false})
       @nav-data => (contains {:control-state :landed})
       @nav-data => (contains {:battery-percent 100 })
       @nav-data => (contains {:pitch (float -1.075) })
@@ -114,7 +114,7 @@
 (fact "about parse-nav-state"
       (let [ state 260048080
             result (parse-nav-state state)
-            {:keys [ flying video target control altitude-control
+            {:keys [ flying video vision control altitude-control
                     user-feedback command-ack camera travelling
                     usb demo bootstrap motors communication
                     software battery emergency-landing timer
@@ -124,7 +124,7 @@
                     adc-watchdog com-watchdog emergency]} result]
         flying => :landed
         video => :off
-        target => :off
+        vision => :off
         control => :euler-angles
         altitude-control => :on
         user-feedback => :off
@@ -156,7 +156,7 @@
         emergency => :ok
         ))
 
-(fact "about which-option-type"
+(fact  "about which-option-type"
       (which-option-type 0) => :demo
       (which-option-type 16) => :target-detect)
 

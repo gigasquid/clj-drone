@@ -87,7 +87,7 @@
   (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
 
 (defn which-option-type [int]
-  (if (= int 0) :demo :vision-detect))
+  (if (= int 0) :demo :target-detect))
 
 (defn parse-target-tag [ba offset]
   (let [target-type (detection-types (get-int ba offset))
