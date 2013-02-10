@@ -215,6 +215,12 @@ flight and immediately communicated to the navigation thread. Example:
 For a further example of navigation goal processing, see [example/nav-goals](https://github.com/gigasquid/clj-drone/blob/master/examples/nav_goals.clj)
 
 
+## Running tests
+The tests use [Midje](https://github.com/marick/Midje).  Use the midje
+[lein plugin](https://github.com/marick/Midje/wiki/Lein-midje)
+    lein midje
+
+
 ## To do list
 - incoming navigation stream targets
 - incoming navigation stream angles
