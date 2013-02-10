@@ -50,6 +50,21 @@
   {0 :default, 1 :init, 2 :landed, 3 :flying, 4 :hovering, 5 :test,
    6 :trans-takeoff, 7 :trans-gotofix, 8 :trans-landing, 9 :trans-looping})
 
+(def detection-types
+  {0 :horizontal-deprecated,
+   1 :vertical-deprectated,
+   2 :horizontal-drone-shell
+   3 :none-disabled
+   4 :roundel-under-drone
+   5 :oriented-roundel-under-drone
+   6 :stripe-ground
+   7 :roundel-front-drone
+   8 :stripe
+   9 :multiple
+   10 :cap-orange-green-front-drone
+   11 :black-white-roundel
+   12 :2nd-verion-shell-tag-front-drone})
+
 (def option-tags [0 :NAVDATA-DEMO-TAG])
 
 (defn new-datagram-packet [data host port]
@@ -73,6 +88,27 @@
 
 (defn which-option-type [int]
   (if (= int 0) :demo :vision-detect))
+
+(defn parse-target-tag [ba offset]
+  (let [target-type (detection-types (get-int ba offset))
+        target-xc (get-int ba (+ offset 4))
+        target-yc (get-int ba (+ offset 8))
+        target-width (get-int ba (+ offset 12))
+        target-height (get-int ba (+ offset 16))
+        target-dist (get-int ba (+ offset 20))
+        target-orient-angle (get-float ba (+ offset 24))
+        ]
+    {:target-type target-type :target-xc target-xc :target-yc target-yc
+     :target-width target-width :target-height target-height
+     :target-dist target-dist :target-orient-angle target-orient-angle}))
+
+(defn parse-target-option [ba offset]
+  (let [target-size 44
+        target-num-tags-detected (get-int ba (+ offset 4))
+        targets (for [i (range 0 target-num-tags-detected)]
+                     (parse-target-tag ba (+ (+ offset 8) (* target-size i))))]
+    {:targets-num target-num-tags-detected
+     :targets targets}))
 
 (defn parse-control-state [ba offset]
   (control-states (bit-shift-right (get-int ba offset) 16)))

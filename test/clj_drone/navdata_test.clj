@@ -25,12 +25,26 @@
                                   b-demo-pitch b-demo-roll b-demo-yaw
                                   b-demo-altitude b-demo-velocity-x
                                   b-demo-velocity-y b-demo-velocity-z)))
-(def b-vision-option-id [16 0])
-(def b-vision-option-size [72 1])
-(def b-vision-tag-detected [0 0 0 0])
-(def b-vision-type [0 0 0 0])
-(def b-vision-xc [0 0 0 0])
-(def b-vision-yc [0 0 0 0])
+(def b-target-option-id [16 0])
+(def b-target-option-size [72 1])
+(def b-target-num-tags-detected [2 0 0 0])
+(def b-target-type [0 0 0 0])
+(def b-target-xc [0 0 0 0])
+(def b-target-yc [0 0 0 0])
+(def b-target-width [0 0 0 0])
+(def b-target-height [0 0 0 0])
+(def b-target-dist [0 0 0 0])
+(def b-target-orient-angle [0 0 0 0])
+(def b-rotation [0 0 0 0])
+(def b-translation [0 0 0 0])
+(def b-camera-source [0 0 0 0])
+(def b-target-tag (flatten (conj b-target-type b-target-xc b-target-yc
+                                 b-target-width b-target-height b-target-dist
+                                 b-target-orient-angle b-rotation b-translation
+                                 b-target-camera-source)))
+(def b-target-option (flatten (conj b-target-option-id b-target-option-size
+                                    b-target-num-tags-detected
+                                    b-target-tag b-target-tag)))
 (def header (map byte [-120 119 102 85]))
 (def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option))))
 (def host (InetAddress/getByName "192.168.1.1"))
@@ -76,7 +90,7 @@
       @nav-data => (contains {:battery :ok})
       @nav-data => (contains {:flying :landed})
       @nav-data => (contains {:seq-num 870})
-      @nav-data => (contains {:vision-flag false})
+      @nav-data => (contains {:target-flag false})
       @nav-data => (contains {:control-state :landed})
       @nav-data => (contains {:battery-percent 100 })
       @nav-data => (contains {:pitch (float -1.075) })
@@ -100,7 +114,7 @@
 (fact "about parse-nav-state"
       (let [ state 260048080
             result (parse-nav-state state)
-            {:keys [ flying video vision control altitude-control
+            {:keys [ flying video target control altitude-control
                     user-feedback command-ack camera travelling
                     usb demo bootstrap motors communication
                     software battery emergency-landing timer
@@ -110,7 +124,7 @@
                     adc-watchdog com-watchdog emergency]} result]
         flying => :landed
         video => :off
-        vision => :off
+        target => :off
         control => :euler-angles
         altitude-control => :on
         user-feedback => :off
@@ -144,4 +158,29 @@
 
 (fact "about which-option-type"
       (which-option-type 0) => :demo
-      (which-option-type 16) => :vision-detect)
+      (which-option-type 16) => :target-detect)
+
+(fact "about parse-target-tag"
+      (let [tag (parse-target-tag b-target-tag 0)]
+        tag => (contains {:target-type :horizontal-deprecated})
+        tag => (contains {:target-xc 0})
+        tag => (contains {:target-yc 0})
+        tag => (contains {:target-width 0})
+        tag => (contains {:target-height 0})
+        tag => (contains {:target-dist 0})
+        tag => (contains {:target-orient-angle 0.0})))
+
+(fact "about parse-target-option"
+      (let [t-tag {:target-type :horizontal-deprecated
+                   :target-xc 0
+                   :target-yc 0
+                   :target-width 0
+                   :target-height 0
+                   :target-dist 0
+                   :target-orient-angle 0.0}
+            option (parse-target-option b-target-option 0)
+            targets (:targets option)]
+        option => (contains {:targets-num 2})
+        (count targets) => 2
+        (first targets) => (contains {:target-type :horizontal-deprecated})))
+
