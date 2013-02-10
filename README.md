@@ -218,6 +218,7 @@ For a further example of navigation goal processing, see [example/nav-goals](htt
 ## Running tests
 The tests use [Midje](https://github.com/marick/Midje).  Use the midje
 [lein plugin](https://github.com/marick/Midje/wiki/Lein-midje)
+
     lein midje
 
 
