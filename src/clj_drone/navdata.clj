@@ -87,9 +87,13 @@
   (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
 
 (defn which-option-type [int]
-  (if (= int 0) :demo :target-detect))
+  (case int
+    0 :demo
+    16 :target-detect
+    :unknown))
 
 (defn parse-target-tag [ba offset]
+  (println "parsing target tag ba=" ba " offset " offset)
   (let [target-type (detection-types (get-int ba offset))
         target-xc (get-int ba (+ offset 4))
         target-yc (get-int ba (+ offset 8))
@@ -108,7 +112,7 @@
         targets (for [i (range 0 target-num-tags-detected)]
                      (parse-target-tag ba (+ (+ offset 8) (* target-size i))))]
     {:targets-num target-num-tags-detected
-     :targets targets}))
+     :targets (vec targets)}))
 
 (defn parse-control-state [ba offset]
   (control-states (bit-shift-right (get-int ba offset) 16)))
@@ -149,7 +153,7 @@
   (case (which-option-type option-header)
       :demo (parse-demo-option ba offset)
       :target-detect (parse-target-option ba offset)
-      :else nil))
+      nil))
 
 (defn parse-options [ba offset options]
   (let [option-header (get-short ba offset)
@@ -157,11 +161,9 @@
         option (parse-option ba offset option-header)
         next-offset (+ offset option-size)
         new-options (merge options option)]
-    (if (>= next-offset (count ba))
+    (if (or (zero? option-size) (>= next-offset (count ba)))
       new-options
-      (parse-options ba next-offset new-options)
-      )))
-
+      (parse-options ba next-offset new-options))))
 
 (defn parse-navdata [navdata-bytes]
   (let [ header (get-int navdata-bytes 0)
@@ -169,9 +171,9 @@
         seqnum (get-int navdata-bytes 8)
         vision-flag (= (get-int navdata-bytes 12) 1)
         pstate (parse-nav-state state)
-        demo-option (parse-demo-option navdata-bytes 16)
+        options (parse-options navdata-bytes 16 {})
         new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
-                        pstate demo-option)]
+                        pstate options)]
     (swap! nav-data merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]

@@ -161,7 +161,8 @@
 
 (fact  "about which-option-type"
       (which-option-type 0) => :demo
-      (which-option-type 16) => :target-detect)
+      (which-option-type 16) => :target-detect
+      (which-option-type 2342342) => :unknown)
 
 (fact "about parse-target-tag"
       (let [tag (parse-target-tag b-target-tag 0)]
