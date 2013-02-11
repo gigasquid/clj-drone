@@ -20,11 +20,13 @@
 (def b-demo-velocity-x [0 0 0 0])
 (def b-demo-velocity-y [0 0 0 0])
 (def b-demo-velocity-z [0 0 0 0])
+(def b-demo-extra (vec (repeat 108 0 )))
 (def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
                                   b-demo-control-state b-demo-battery
                                   b-demo-pitch b-demo-roll b-demo-yaw
                                   b-demo-altitude b-demo-velocity-x
-                                  b-demo-velocity-y b-demo-velocity-z)))
+                                  b-demo-velocity-y b-demo-velocity-z
+                                  b-demo-extra)))
 (def b-target-option-id [16 0])
 (def b-target-option-size [72 1])
 (def b-target-num-tags-detected [2 0 0 0])
@@ -45,8 +47,9 @@
 (def b-target-option (flatten (conj b-target-option-id b-target-option-size
                                     b-target-num-tags-detected
                                     b-target-tag b-target-tag)))
+(def b-options (flatten (conj b-demo-option b-target-option)))
 (def header (map byte [-120 119 102 85]))
-(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option))))
+(def nav-input  (map byte (flatten (conj b-header b-state b-seqnum b-vision b-demo-option b-target-option))))
 (def host (InetAddress/getByName "192.168.1.1"))
 (def port 5554)
 (def socket (DatagramSocket. ))
@@ -184,3 +187,15 @@
         (count targets) => 2
         (first targets) => (contains {:target-type :horizontal-deprecated})))
 
+(fact "about parse option with demo"
+      (let [option (parse-options b-demo-option 0 {})]
+        option => (contains {:control-state :landed})))
+
+(fact "about parse option with targets"
+      (let [option (parse-options b-target-option 0 {})]
+        option => (contains {:targets-num 2})))
+
+(fact "about parse-options with demo and targets"
+      (let [options (parse-options nav-input 16 {})]
+        options => (contains {:control-state :landed})
+        options => (contains {:targets-num 2})))

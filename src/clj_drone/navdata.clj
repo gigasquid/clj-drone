@@ -144,6 +144,25 @@
    {}
    state-masks))
 
+
+(defn parse-option [ba offset option-header]
+  (case (which-option-type option-header)
+      :demo (parse-demo-option ba offset)
+      :target-detect (parse-target-option ba offset)
+      :else nil))
+
+(defn parse-options [ba offset options]
+  (let [option-header (get-short ba offset)
+        option-size (get-short ba (+ offset 2))
+        option (parse-option ba offset option-header)
+        next-offset (+ offset option-size)
+        new-options (merge options option)]
+    (if (>= next-offset (count ba))
+      new-options
+      (parse-options ba next-offset new-options)
+      )))
+
+
 (defn parse-navdata [navdata-bytes]
   (let [ header (get-int navdata-bytes 0)
         state (get-int navdata-bytes 4)
