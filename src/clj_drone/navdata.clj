@@ -57,13 +57,15 @@
    3 :none-disabled
    4 :roundel-under-drone
    5 :oriented-roundel-under-drone
-   6 :stripe-ground
-   7 :roundel-front-drone
-   8 :stripe
-   9 :multiple
-   10 :cap-orange-green-front-drone
-   11 :black-white-roundel
-   12 :2nd-verion-shell-tag-front-drone})
+   6 :oriented-roundel-front-drone
+   7 :stripe-ground
+   8 :roundel-front-drone
+   9 :stripe
+   10 :multiple
+   11 :cap-orange-green-front-drone
+   12 :black-white-roundel
+   13 :2nd-verion-shell-tag-front-drone
+   14 :tower-side-front-camera})
 
 (def option-tags [0 :NAVDATA-DEMO-TAG])
 
@@ -93,7 +95,6 @@
     :unknown))
 
 (defn parse-target-tag [ba offset]
-  (println "parsing target tag ba=" ba " offset " offset)
   (let [target-type (detection-types (get-int ba offset))
         target-xc (get-int ba (+ offset 4))
         target-yc (get-int ba (+ offset 8))
@@ -127,6 +128,7 @@
         velocity-x (float (get-float ba (+ offset 28)))
         velocity-y (float (get-float ba (+ offset 32)))
         velocity-z (float (get-float ba (+ offset 26)))
+        detect-camera-type (get-int ba (+ offset 96))
         ]
     { :control-state control-state
      :battery-percent battery
@@ -137,6 +139,7 @@
      :velocity-x velocity-x
      :velocity-y velocity-y
      :velocity-z velocity-z
+     :detect-camera-type (detection-types detect-camera-type)
      }))
 
 (defn parse-nav-state [state]
@@ -158,7 +161,7 @@
 (defn parse-options [ba offset options]
   (let [option-header (get-short ba offset)
         option-size (get-short ba (+ offset 2))
-        option (parse-option ba offset option-header)
+        option (when-not (zero? option-size) (parse-option ba offset option-header))
         next-offset (+ offset option-size)
         new-options (merge options option)]
     (if (or (zero? option-size) (>= next-offset (count ba)))

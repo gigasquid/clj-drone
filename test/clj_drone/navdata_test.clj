@@ -5,6 +5,11 @@
             [clj-drone.core :refer :all])
   (:import (java.net InetAddress DatagramSocket)))
 
+;; matrix 33 is 9 floats
+;; vector 31 is 3 floats
+(def b-matrix33  (vec (repeat (* 9 4) 0 )))
+(def b-vector31  (vec (repeat (* 3 4) 0 )))
+
 (def b-header [-120 119 102 85])
 (def b-state [-48 4 -128 15])
 (def b-seqnum [102 3 0 0])
@@ -20,13 +25,23 @@
 (def b-demo-velocity-x [0 0 0 0])
 (def b-demo-velocity-y [0 0 0 0])
 (def b-demo-velocity-z [0 0 0 0])
-(def b-demo-extra (vec (repeat 108 0 )))
+(def b-demo-num-frames [0 0 0 0])
+(def b-demo-detect-camera-rot b-matrix33)
+(def b-demo-detect-camera-trans b-vector31)
+(def b-demo-detect-tag-index [0 0 0 0])
+(def b-demo-detect-camera-type [4 0 0 0])
+(def b-demo-drone-camera-rot b-matrix33)
+(def b-demo-drone-camera-trans b-vector31)
 (def b-demo-option (flatten (conj b-demo-option-id b-demo-option-size
                                   b-demo-control-state b-demo-battery
                                   b-demo-pitch b-demo-roll b-demo-yaw
                                   b-demo-altitude b-demo-velocity-x
                                   b-demo-velocity-y b-demo-velocity-z
-                                  b-demo-extra)))
+                                  b-demo-num-frames
+                                  b-demo-detect-camera-rot b-demo-detect-camera-trans
+                                  b-demo-detect-tag-index
+                                  b-demo-detect-camera-type b-demo-drone-camera-rot
+                                  b-demo-drone-camera-trans)))
 (def b-target-option-id [16 0])
 (def b-target-option-size [72 1])
 (def b-target-num-tags-detected [2 0 0 0])
@@ -85,6 +100,7 @@
         option => (contains {:velocity-x  (float 0.0) })
         option => (contains {:velocity-y  (float 0.0) })
         option => (contains {:velocity-z  (float 0.0) })
+        option => (contains {:detect-camera-type :roundel-under-drone })
         ))
 
 (fact "about parse-navdata"
@@ -200,3 +216,7 @@
       (let [options (parse-options nav-input 16 {})]
         options => (contains {:control-state :landed})
         options => (contains {:targets-num 2})))
+
+(bit-shift-left 1 (- 9 1))
+
+(bit-shift-left 6 1)

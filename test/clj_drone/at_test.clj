@@ -29,7 +29,9 @@
         (build-command :fly 3 0 0 0 0.5) =>  (build-command :spin-right 3 0.5)
         (build-command :flat-trim 3) =>  "AT*FTRIM=3,\r"
         (build-command :reset-watchdog 3) => "AT*COMWDG=3,\r"
-        (build-command :init-navdata 3) =>  "AT*CONFIG=3,\"general:navdata_demo\",\"TRUE\"\r"
-        (build-command :control-ack 3) => "AT*CTRL=3,0\r"))
+        (build-command :init-navdata 3) =>  "AT*CONFIG=3,\"general:navdata_demo\",\"FALSE\"\r"
+        (build-command :control-ack 3) => "AT*CTRL=3,0\r"
+        (build-command :init-targeting 3) =>  "AT*CONFIG=3,\"detect:detect_type\",\"12\"\r"
+        ))
 
 ;; (run-tests 'clj-drone.at-test)

@@ -18,6 +18,12 @@
     :flat-trim       {:command-class "AT*FTRIM"}
     :reset-watchdog  {:command-class "AT*COMWDG"}
     :init-navdata    {:command-class "AT*CONFIG" :option "\"general:navdata_demo\""
-                                                 :value "\"TRUE\""}
+                      :value "\"FALSE\""}
+    :init-targeting  {:command-class "AT*CONFIG" :option "\"detect:detect_type\""
+                      :value "\"10\""}
+    :target-shell-h  {:command-class "AT*CONFIG" :option "\"detect:detections_select_h\""
+                      :value "\"32\""}
+    :target-roundel-v  {:command-class "AT*CONFIG" :option "\"detect:detections_select_v_hsync\""
+                         :value "\"128\""}
     :control-ack     {:command-class "AT*CTRL" :value 0}
     })
