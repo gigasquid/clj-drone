@@ -52,7 +52,7 @@
 
 (def detection-types
   {0 :horizontal-deprecated,
-   1 :vertical-deprectated,
+   1 :vertical-deprecated,
    2 :horizontal-drone-shell
    3 :none-disabled
    4 :roundel-under-drone
@@ -88,24 +88,34 @@
 (defn get-float [ba offset]
   (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
 
+(defn get-int-by-n [ba offset n]
+  (let [getf (fn [x y] (conj x (get-int ba (+ offset (* y 4)))))]
+    (nth (reduce getf [] (range 0 (inc n))) n)))
+
 (defn which-option-type [int]
   (case int
     0 :demo
     16 :target-detect
     :unknown))
 
-(defn parse-target-tag [ba offset]
-  (let [target-type (detection-types (get-int ba offset))
-        target-xc (get-int ba (+ offset 4))
-        target-yc (get-int ba (+ offset 8))
-        target-width (get-int ba (+ offset 12))
-        target-height (get-int ba (+ offset 16))
-        target-dist (get-int ba (+ offset 20))
-        target-orient-angle (get-float ba (+ offset 24))
+(defn parse-target-tag [ba offset n]
+  (let [noffset (+ offset 8)
+        target-type (detection-types (get-int-by-n ba noffset n))
+        target-xc (get-int-by-n ba (+ noffset 16) n)
+        target-yc (get-int-by-n ba (+ noffset (* 2 16)) n)
+        target-width (get-int-by-n ba (+ noffset (* 3 16)) n)
+        target-height (get-int-by-n ba (+ noffset (* 4 16)) n)
+        target-dist (get-int-by-n ba (+ noffset (* 5 16)) n )
+        target-orient-angle (get-int-by-n ba (+ noffset (* 6 16)) n)
+        taget-camera-source (get-int-by-n ba (+ noffset (* 6 16) 144 48) n)
         ]
-    {:target-type target-type :target-xc target-xc :target-yc target-yc
+    {:target-type target-type
+     :target-xc target-xc :target-yc target-yc
      :target-width target-width :target-height target-height
-     :target-dist target-dist :target-orient-angle target-orient-angle}))
+     :target-dist target-dist :target-orient-angle target-orient-angle
+     }
+    ))
+
 
 (defn parse-target-option [ba offset]
   (let [target-size 44

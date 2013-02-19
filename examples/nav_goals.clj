@@ -51,7 +51,7 @@
 
 (drone-initialize)
 (drone-init-navdata)
-;(end-navstream)  If running in the repl end the nav-stream when done
+(end-navstream)  If running in the repl end the nav-stream when done
 
 
 
