@@ -52,7 +52,7 @@
 (def b-target-width [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
 (def b-target-height [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
 (def b-target-dist [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
-(def b-target-orient-angle [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
+(def b-target-orient-angle [0 96 -122 -60 0 96 -122 -60 0 96 -122 -60 0 96 -122 -60])
 (def b-target-rotation (flatten (conj b-matrix33  b-matrix33  b-matrix33  b-matrix33)))
 (def b-target-translation (flatten (conj b-vector31 b-vector31 b-vector31 b-vector31)))
 (def b-target-camera-source [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
@@ -87,13 +87,15 @@
 (fact "about get-float"
       (get-float (map byte b-demo-pitch) 0) => -1075.0)
 
-
 (facts "about get-int-by-n"
        (get-int-by-n (map byte b-target-type) 0 0) => 1
        (get-int-by-n (map byte b-target-type) 0 1) => 2
        (get-int-by-n (map byte b-target-type) 0 2) => 3
        (get-int-by-n (map byte b-target-type) 0 3) => 4)
 
+
+(facts "about get-float-by-n"
+       (get-float-by-n (map byte b-demo-pitch) 0 0) => -1075.0)
 
 (fact "about parse-control-state"
       (parse-control-state b-demo-option 4) => :landed)
@@ -189,7 +191,7 @@
       (which-option-type 16) => :target-detect
       (which-option-type 2342342) => :unknown)
 
-(fact "about parse-target-tag"
+(fact "about parse-target-tag with the first target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 0)]
         tag => (contains {:target-type :vertical-deprecated})
         tag => (contains {:target-xc 1})
@@ -197,34 +199,69 @@
         tag => (contains {:target-width 1})
         tag => (contains {:target-height 1})
         tag => (contains {:target-dist 1})
-        tag => (contains {:target-orient-angle 1})))
+        tag => (contains {:target-orient-angle -1075.0})
+        tag => (contains {:target-camera-source 1})))
+
+(fact "about parse-target-tag with the second target"
+      (let [tag (parse-target-tag (map byte b-target-option) 0 1)]
+        tag => (contains {:target-type :horizontal-drone-shell})
+        tag => (contains {:target-xc 2})
+        tag => (contains {:target-yc 2})
+        tag => (contains {:target-width 2})
+        tag => (contains {:target-height 2})
+        tag => (contains {:target-dist 2})
+        tag => (contains {:target-orient-angle -1075.0})
+        tag => (contains {:target-camera-source 2})))
+
+(fact "about parse-target-tag with the third target"
+      (let [tag (parse-target-tag (map byte b-target-option) 0 2)]
+        tag => (contains {:target-type :none-disabled})
+        tag => (contains {:target-xc 3})
+        tag => (contains {:target-yc 3})
+        tag => (contains {:target-width 3})
+        tag => (contains {:target-height 3})
+        tag => (contains {:target-dist 3})
+        tag => (contains {:target-orient-angle -1075.0})
+        tag => (contains {:target-camera-source 3})))
+
+(fact "about parse-target-tag with the fourth target"
+      (let [tag (parse-target-tag (map byte b-target-option) 0 3)]
+        tag => (contains {:target-type :roundel-under-drone})
+        tag => (contains {:target-xc 4})
+        tag => (contains {:target-yc 4})
+        tag => (contains {:target-width 4})
+        tag => (contains {:target-height 4})
+        tag => (contains {:target-dist 4})
+        tag => (contains {:target-orient-angle -1075.0})
+        tag => (contains {:target-camera-source 4})))
 
 
-;; (fact "about parse-target-option"
-;;       (let [t-tag {:target-type :horizontal-deprecated
-;;                    :target-xc 0
-;;                    :target-yc 0
-;;                    :target-width 0
-;;                    :target-height 0
-;;                    :target-dist 0
-;;                    :target-orient-angle 0.0}
-;;             option (parse-target-option b-target-option 0)
-;;             targets (:targets option)]
-;;         option => (contains {:targets-num 2})
-;;         (count targets) => 2
-;;         (first targets) => (contains {:target-type :horizontal-deprecated})))
+(fact "about parse-target-option"
+      (let [t-tag {:target-type :vertical-deprecated
+                   :target-xc 1
+                   :target-yc 1
+                   :target-width 1
+                   :target-height 1
+                   :target-dist 1
+                   :target-orient-angle -1075.0
+                   :target-camera-source 1}
+            option (parse-target-option b-target-option 0)
+            targets (:targets option)]
+        option => (contains {:targets-num 2})
+        (count targets) => 2
+        (first targets) => (contains {:target-type :vertical-deprecated})))
 
 (fact "about parse option with demo"
       (let [option (parse-options b-demo-option 0 {})]
         option => (contains {:control-state :landed})))
 
-;; (fact "about parse option with targets"
-;;       (let [option (parse-options b-target-option 0 {})]
-;;         option => (contains {:targets-num 2})))
+(fact "about parse option with targets"
+      (let [option (parse-options b-target-option 0 {})]
+        option => (contains {:targets-num 2})))
 
-;; (fact "about parse-options with demo and targets"
-;;       (let [options (parse-options nav-input 16 {})]
-;;         options => (contains {:control-state :landed})
-;;         options => (contains {:targets-num 2})))
+(fact "about parse-options with demo and targets"
+      (let [options (parse-options nav-input 16 {})]
+        options => (contains {:control-state :landed})
+        options => (contains {:targets-num 2})))
 
 

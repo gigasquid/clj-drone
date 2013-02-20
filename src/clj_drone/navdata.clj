@@ -88,9 +88,15 @@
 (defn get-float [ba offset]
   (Float/intBitsToFloat (Integer. (bytes-to-int ba offset 4))))
 
-(defn get-int-by-n [ba offset n]
-  (let [getf (fn [x y] (conj x (get-int ba (+ offset (* y 4)))))]
+(defn get-type-by-n [ba type offset n]
+  (let [getf (fn [x y] (conj x (type ba (+ offset (* y 4)))))]
     (nth (reduce getf [] (range 0 (inc n))) n)))
+
+(defn get-int-by-n [ba offset n]
+  (get-type-by-n ba get-int offset n))
+
+(defn get-float-by-n [ba offset n]
+  (get-type-by-n ba get-float offset n))
 
 (defn which-option-type [int]
   (case int
@@ -106,22 +112,21 @@
         target-width (get-int-by-n ba (+ noffset (* 3 16)) n)
         target-height (get-int-by-n ba (+ noffset (* 4 16)) n)
         target-dist (get-int-by-n ba (+ noffset (* 5 16)) n )
-        target-orient-angle (get-int-by-n ba (+ noffset (* 6 16)) n)
-        taget-camera-source (get-int-by-n ba (+ noffset (* 6 16) 144 48) n)
+        target-orient-angle (get-float-by-n ba (+ noffset (* 6 16)) n)
+        target-camera-source (get-int-by-n ba (+ noffset (* 7 16) 144 48) n)
         ]
     {:target-type target-type
      :target-xc target-xc :target-yc target-yc
      :target-width target-width :target-height target-height
      :target-dist target-dist :target-orient-angle target-orient-angle
-     }
-    ))
-
+     :target-camera-source target-camera-source
+     }))
 
 (defn parse-target-option [ba offset]
   (let [target-size 44
         target-num-tags-detected (get-int ba (+ offset 4))
         targets (for [i (range 0 target-num-tags-detected)]
-                     (parse-target-tag ba (+ (+ offset 8) (* target-size i))))]
+                     (parse-target-tag ba offset i))]
     {:targets-num target-num-tags-detected
      :targets (vec targets)}))
 

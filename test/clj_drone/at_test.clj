@@ -24,14 +24,12 @@
         (build-command :tilt-right 3 0.5) =>  "AT*PCMD=3,1,1056964608,0,0,0\r"
         (build-command :tilt-left 3 0.8) =>  "AT*PCMD=3,1,-1085485875,0,0,0\r"
         (build-command :hover 3) =>  "AT*PCMD=3,0,0,0,0,0\r"
-        (build-command :fly 3 0.5 -0.8 0.5 -0.8) => 
+        (build-command :fly 3 0.5 -0.8 0.5 -0.8) =>
         "AT*PCMD=3,1,1056964608,-1085485875,1056964608,-1085485875\r"
         (build-command :fly 3 0 0 0 0.5) =>  (build-command :spin-right 3 0.5)
         (build-command :flat-trim 3) =>  "AT*FTRIM=3,\r"
         (build-command :reset-watchdog 3) => "AT*COMWDG=3,\r"
         (build-command :init-navdata 3) =>  "AT*CONFIG=3,\"general:navdata_demo\",\"FALSE\"\r"
         (build-command :control-ack 3) => "AT*CTRL=3,0\r"
-        (build-command :init-targeting 3) =>  "AT*CONFIG=3,\"detect:detect_type\",\"12\"\r"
+        (build-command :init-targeting 3) =>  "AT*CONFIG=3,\"detect:detect_type\",\"10\"\r"
         ))
-
-;; (run-tests 'clj-drone.at-test)
