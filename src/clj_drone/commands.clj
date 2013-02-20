@@ -24,6 +24,12 @@
     :target-shell-h  {:command-class "AT*CONFIG" :option "\"detect:detections_select_h\""
                       :value "\"32\""}
     :target-roundel-v  {:command-class "AT*CONFIG" :option "\"detect:detections_select_v_hsync\""
-                         :value "\"128\""}
+                        :value "\"128\""}
+    :target-color-green {:command-class "AT*CONFIG" :option "\"detect:enemy_colors\""
+                         :value "\"1\""}
+    :target-color-yellow {:command-class "AT*CONFIG" :option "\"detect:enemy_colors\""
+                        :value "\"2\""}
+    :target-color-blue {:command-class "AT*CONFIG" :option "\"detect:enemy_colors\""
+                        :value "\"3\""}
     :control-ack     {:command-class "AT*CTRL" :value 0}
     })

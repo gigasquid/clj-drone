@@ -33,4 +33,10 @@
         (build-command :control-ack 3) => "AT*CTRL=3,0\r"
         (build-command :init-targeting 3) =>  "AT*CONFIG=3,\"detect:detect_type\",\"10\"\r"
         (build-command :target-shell-h 3) =>  "AT*CONFIG=3,\"detect:detections_select_h\",\"32\"\r"
-        (build-command :target-roundel-v 3) =>  "AT*CONFIG=3,\"detect:detections_select_v_hsync\",\"128\"\r"))
+        (build-command :target-roundel-v 3) =>  "AT*CONFIG=3,\"detect:detections_select_v_hsync\",\"128\"\r"
+        (build-command :target-color-green 3) =>  "AT*CONFIG=3,\"detect:enemy_colors\",\"1\"\r"
+        (build-command :target-color-yellow 3) =>  "AT*CONFIG=3,\"detect:enemy_colors\",\"2\"\r"
+        (build-command :target-color-blue 3) =>  "AT*CONFIG=3,\"detect:enemy_colors\",\"3\"\r"
+        ))
+
+
