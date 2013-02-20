@@ -32,4 +32,5 @@
         (build-command :init-navdata 3) =>  "AT*CONFIG=3,\"general:navdata_demo\",\"FALSE\"\r"
         (build-command :control-ack 3) => "AT*CTRL=3,0\r"
         (build-command :init-targeting 3) =>  "AT*CONFIG=3,\"detect:detect_type\",\"10\"\r"
-        ))
+        (build-command :target-shell-h 3) =>  "AT*CONFIG=3,\"detect:detections_select_h\",\"32\"\r"
+        (build-command :target-roundel-v 3) =>  "AT*CONFIG=3,\"detect:detections_select_v_hsync\",\"128\"\r"))

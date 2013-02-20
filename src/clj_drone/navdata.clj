@@ -67,6 +67,14 @@
    13 :2nd-verion-shell-tag-front-drone
    14 :tower-side-front-camera})
 
+(def detect-tag-types
+  {0 :none
+   6 :shell_tag_v2
+   8 :black_roundel})
+
+(defn tag-type-mask [type-num]
+  (bit-shift-left 1 (- type-num 1)))
+
 (def option-tags [0 :NAVDATA-DEMO-TAG])
 
 (defn new-datagram-packet [data host port]
