@@ -9,6 +9,7 @@
 (drone-initialize)
 (drone :init-targeting)
 (drone :target-shell-h)
+(drone :target-color-blue)
 (drone :target-roundel-v)
 (drone-init-navdata)
 (drone :take-off)

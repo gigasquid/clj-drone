@@ -191,9 +191,12 @@
       (which-option-type 16) => :target-detect
       (which-option-type 2342342) => :unknown)
 
+(fact "about parse-camera-detect"
+      (parse-camera-detect 131072) => :vertical-hsync)
+
 (fact "about parse-target-tag with the first target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 0)]
-        tag => (contains {:target-type :vertical-deprecated})
+        tag => (contains {:target-type :horizontal})
         tag => (contains {:target-xc 1})
         tag => (contains {:target-yc 1})
         tag => (contains {:target-width 1})
@@ -204,7 +207,7 @@
 
 (fact "about parse-target-tag with the second target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 1)]
-        tag => (contains {:target-type :horizontal-drone-shell})
+        tag => (contains {:target-type :horizontal})
         tag => (contains {:target-xc 2})
         tag => (contains {:target-yc 2})
         tag => (contains {:target-width 2})
@@ -215,7 +218,7 @@
 
 (fact "about parse-target-tag with the third target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 2)]
-        tag => (contains {:target-type :none-disabled})
+        tag => (contains {:target-type :horizontal})
         tag => (contains {:target-xc 3})
         tag => (contains {:target-yc 3})
         tag => (contains {:target-width 3})
@@ -226,7 +229,7 @@
 
 (fact "about parse-target-tag with the fourth target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 3)]
-        tag => (contains {:target-type :roundel-under-drone})
+        tag => (contains {:target-type :horizotal})
         tag => (contains {:target-xc 4})
         tag => (contains {:target-yc 4})
         tag => (contains {:target-width 4})
