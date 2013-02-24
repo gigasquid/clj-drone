@@ -17,6 +17,4 @@
 (end-navstream)
 @nav-data
 
-(bit-shift-left 1 5)
 
-(bit-and 1 (bit-shift-left 1 2))

@@ -31,5 +31,15 @@
                         :value "\"2\""}
     :target-color-blue {:command-class "AT*CONFIG" :option "\"detect:enemy_colors\""
                         :value "\"3\""}
+    :anim-yaw-shake {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
+                     :value "\"8,2000\""}
+    :anim-turnaround {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
+                      :value "\"6,5000\""}
+    :anim-wave {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
+                :value "\"13,5000\""}
+    :anim-double-phi-theta-mixed {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
+                                  :value "\"15,5000\""}
+    :anim-flip-right {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
+                      :value "\"19,15\""}
     :control-ack     {:command-class "AT*CTRL" :value 0}
     })

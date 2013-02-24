@@ -67,6 +67,24 @@
    13 :2nd-verion-shell-tag-front-drone
    14 :tower-side-front-camera})
 
+
+(defn parse-tag-detect [n]
+  (case (bit-shift-right n 16)
+    0 :none
+    1 :shell-tag
+    2 :roundel
+    3 :oriented-roundel
+    4 :stripe
+    5 :cap
+    6 :shell-tag-v2
+    7 :black-roundel
+    :unknown))
+
+(def camera-sources
+  {0 :horizontal
+   1 :vertical
+   2 :vertical-hsync})
+
 (def detect-tag-types
   {0 :none
    6 :shell_tag_v2
@@ -114,7 +132,7 @@
 
 (defn parse-target-tag [ba offset n]
   (let [noffset (+ offset 8)
-        target-type (detection-types (get-int-by-n ba noffset n))
+        target-type (get-int-by-n ba noffset n)
         target-xc (get-int-by-n ba (+ noffset 16) n)
         target-yc (get-int-by-n ba (+ noffset (* 2 16)) n)
         target-width (get-int-by-n ba (+ noffset (* 3 16)) n)
@@ -123,11 +141,11 @@
         target-orient-angle (get-float-by-n ba (+ noffset (* 6 16)) n)
         target-camera-source (get-int-by-n ba (+ noffset (* 7 16) 144 48) n)
         ]
-    {:target-type target-type
+    {:target-type (parse-tag-detect target-type)
      :target-xc target-xc :target-yc target-yc
      :target-width target-width :target-height target-height
      :target-dist target-dist :target-orient-angle target-orient-angle
-     :target-camera-source target-camera-source
+     :target-camera-source (camera-sources target-camera-source)
      }))
 
 (defn parse-target-option [ba offset]
