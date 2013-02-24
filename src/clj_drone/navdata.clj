@@ -69,16 +69,8 @@
 
 
 (defn parse-tag-detect [n]
-  (case (bit-shift-right n 16)
-    0 :none
-    1 :shell-tag
-    2 :roundel
-    3 :oriented-roundel
-    4 :stripe
-    5 :cap
-    6 :shell-tag-v2
-    7 :black-roundel
-    :unknown))
+  (when n
+    (camera-sources (bit-shift-right n 16))))
 
 (def camera-sources
   {0 :horizontal
