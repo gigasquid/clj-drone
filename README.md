@@ -286,7 +286,6 @@ The tests use [Midje](https://github.com/marick/Midje).  Use the midje
 
 
 ## To do list
-- incoming navigation stream targets
 - incoming navigation stream angles
 - incoming video stream
 
