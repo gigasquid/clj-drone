@@ -75,6 +75,26 @@ number gets out of sync.  It will ignore commands that come in with a bad or out
 (drone :reset-watchdog)
 ````
 
+Visual tag targeting commands
+
+````clojure
+(drone :init-targeting) ;=> sets up drone to receive navigation visual tags
+(drone :target-shell-h) ;=> detects indoor and outdoor hull tags on horizontal camera
+(drone :target-roundel-v) ;=> detects the roundel tag on the vertical camera
+(drone :target-color-green) ;=> detects the green indoor/outhull hull tags
+(drone :target-color-yellow) ;=> detects the yellow indoor/outhull hull tags
+(drone :target-color-blue) ;=> detects the blue indoor/outhull hull tags
+````
+
+Animations or Tricks
+`````clojure
+(drone :anim-yaw-shake) ;=> really fast back and forth yaw turn
+(drone :anim-turnaround) ;=> kinda a jerky turnaround
+(drone :anim-wave) ;=> my favorite - kinda like a hoola-hoop
+(drone :anim-double-phi-theta-mixed) ;=> kinda crazy move had to describe
+(drone :anim-flip-right)
+````
+
 ## Navigation Data
 To start receiving the navigation data, you must issue the command.
 ````clojure
@@ -143,6 +163,20 @@ The possible values are:
 :velocity-x
 :velocity-y
 :velocity-z
+
+;;Visual Target/Tag Detection
+:targets-num  ;=> number of tags detected 0 - 4
+:detect-camera-type :non-disabled or :multiple (meaning horizonal and
+vertical)
+:targets ;=>  [vec of targets detected if targets-num > 0 ]
+     [{:target-type :horizontal or :vertical or :vertical-hsync
+       :target-xc ;=> in cm
+       :target-yc ;=> in cm
+       :target-width ;=> in cm
+       :target-height ;=> in cm
+       :target-dist ;=> in cm
+       :target-orient-angle => in degrees if the target is roundel,
+       :target-camera-source (same as target-type - as far as I can tell anyway)}]
 ```
 
 The nav stream will keep going unless interrupted or called to end by
@@ -167,6 +201,35 @@ Example Program to log navigation data for a flight
 (drone :land)
 (end-navstream)
 ````
+
+## Detecting Targets with the Navigation Data
+You can configure the drone to detect pre-defined tags
+on the horizontal and vertical cameras. You first need to tell the
+drone which targets to detect on what cameras.  Here is an example
+program:
+````clojure
+(ns clj-drone.example.target-test
+  (:require [clj-drone.core :refer :all]
+            [clj-drone.navdata :refer :all]))
+
+;; logging is configured to go to the logs/drone.log file
+
+(set-log-data [:seq-num :battery-percent :control-state :detect-camera-type
+               :targets-num :targets])
+(drone-initialize)
+(drone :init-targeting)
+(drone :target-shell-h)
+(drone :target-color-blue)
+;; the drone will look for targets with blue tags on the horizontal camera
+(drone :target-roundel-v)
+;; the drone will look for the black and white roundel on the vertical camera
+(drone-init-navdata)
+;; watch the drone.log file and move the drone above the roundel
+;; target and put the hull in front of the horizontal camera
+
+(end-navstream)  ;; this ends the logging
+
+```
 
 ## Auto Navigation with Goals and Beliefs
 Why shouldn't the AR drone have goals and beliefs?
