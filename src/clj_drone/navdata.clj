@@ -67,15 +67,14 @@
    13 :2nd-verion-shell-tag-front-drone
    14 :tower-side-front-camera})
 
-
-(defn parse-tag-detect [n]
-  (when n
-    (camera-sources (bit-shift-right n 16))))
-
 (def camera-sources
   {0 :horizontal
    1 :vertical
    2 :vertical-hsync})
+
+(defn parse-tag-detect [n]
+  (when n
+    (camera-sources (bit-shift-right n 16))))
 
 (def detect-tag-types
   {0 :none
@@ -84,6 +83,8 @@
 
 (defn tag-type-mask [type-num]
   (bit-shift-left 1 (- type-num 1)))
+
+(tag-type-mask 6)
 
 (def option-tags [0 :NAVDATA-DEMO-TAG])
 

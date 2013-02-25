@@ -55,7 +55,7 @@
 (def b-target-orient-angle [0 96 -122 -60 0 96 -122 -60 0 96 -122 -60 0 96 -122 -60])
 (def b-target-rotation (flatten (conj b-matrix33  b-matrix33  b-matrix33  b-matrix33)))
 (def b-target-translation (flatten (conj b-vector31 b-vector31 b-vector31 b-vector31)))
-(def b-target-camera-source [1 0 0 0 2 0 0 0 3 0 0 0 4 0 0 0])
+(def b-target-camera-source [1 0 0 0 2 0 0 0 2 0 0 0 2 0 0 0])
 (def b-target-option (flatten (conj b-target-option-id b-target-option-size
                                     b-target-num-tags-detected
                                     b-target-type b-target-xc b-target-yc
@@ -191,8 +191,8 @@
       (which-option-type 16) => :target-detect
       (which-option-type 2342342) => :unknown)
 
-(fact "about parse-camera-detect"
-      (parse-camera-detect 131072) => :vertical-hsync)
+(fact "about parse-tag-detect"
+      (parse-tag-detect 131072) => :vertical-hsync)
 
 (fact "about parse-target-tag with the first target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 0)]
@@ -203,7 +203,7 @@
         tag => (contains {:target-height 1})
         tag => (contains {:target-dist 1})
         tag => (contains {:target-orient-angle -1075.0})
-        tag => (contains {:target-camera-source 1})))
+        tag => (contains {:target-camera-source :vertical})))
 
 (fact "about parse-target-tag with the second target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 1)]
@@ -214,7 +214,7 @@
         tag => (contains {:target-height 2})
         tag => (contains {:target-dist 2})
         tag => (contains {:target-orient-angle -1075.0})
-        tag => (contains {:target-camera-source 2})))
+        tag => (contains {:target-camera-source :vertical-hsync})))
 
 (fact "about parse-target-tag with the third target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 2)]
@@ -225,22 +225,22 @@
         tag => (contains {:target-height 3})
         tag => (contains {:target-dist 3})
         tag => (contains {:target-orient-angle -1075.0})
-        tag => (contains {:target-camera-source 3})))
+        tag => (contains {:target-camera-source :vertical-hsync})))
 
 (fact "about parse-target-tag with the fourth target"
       (let [tag (parse-target-tag (map byte b-target-option) 0 3)]
-        tag => (contains {:target-type :horizotal})
+        tag => (contains {:target-type :horizontal})
         tag => (contains {:target-xc 4})
         tag => (contains {:target-yc 4})
         tag => (contains {:target-width 4})
         tag => (contains {:target-height 4})
         tag => (contains {:target-dist 4})
         tag => (contains {:target-orient-angle -1075.0})
-        tag => (contains {:target-camera-source 4})))
+        tag => (contains {:target-camera-source :vertical-hsync})))
 
 
 (fact "about parse-target-option"
-      (let [t-tag {:target-type :vertical-deprecated
+      (let [t-tag {:target-type :horizontal
                    :target-xc 1
                    :target-yc 1
                    :target-width 1
@@ -252,7 +252,7 @@
             targets (:targets option)]
         option => (contains {:targets-num 2})
         (count targets) => 2
-        (first targets) => (contains {:target-type :vertical-deprecated})))
+        (first targets) => (contains {:target-type :horizontal})))
 
 (fact "about parse option with demo"
       (let [option (parse-options b-demo-option 0 {})]
