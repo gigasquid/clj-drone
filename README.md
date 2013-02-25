@@ -92,7 +92,7 @@ Animations or Tricks
 (drone :anim-turnaround) ;=> kinda a jerky turnaround
 (drone :anim-wave) ;=> my favorite - kinda like a hoola-hoop
 (drone :anim-double-phi-theta-mixed) ;=> kinda crazy move had to describe
-(drone :anim-flip-right)
+(drone :anim-flip-right) ;=> Classic flip goodness
 ````
 
 ## Navigation Data
@@ -166,7 +166,7 @@ The possible values are:
 
 ;;Visual Target/Tag Detection
 :targets-num  ;=> number of tags detected 0 - 4
-:detect-camera-type :non-disabled or :multiple (meaning horizonal and
+:detect-camera-type ;=> :non-disabled or :multiple (meaning horizonal and
 vertical)
 :targets ;=>  [vec of targets detected if targets-num > 0 ]
      [{:target-type :horizontal or :vertical or :vertical-hsync
@@ -175,8 +175,8 @@ vertical)
        :target-width ;=> in cm
        :target-height ;=> in cm
        :target-dist ;=> in cm
-       :target-orient-angle => in degrees if the target is roundel,
-       :target-camera-source (same as target-type - as far as I can tell anyway)}]
+       :target-orient-angle ;=> in degrees if the target is roundel,
+       :target-camera-source ;=>(same as target-type - as far as I can tell anyway)}]
 ```
 
 The nav stream will keep going unless interrupted or called to end by
