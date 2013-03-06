@@ -13,6 +13,7 @@
 (def at-socket (DatagramSocket. ))
 (def navdata-socket (DatagramSocket. ))
 (def counter (atom 0))
+(def nav-agent (agent {}))
 (declare drone)
 
 (defn init-logger []
@@ -55,7 +56,7 @@
     (log/info "Watchdog Reset")
     (drone :reset-watchdog)))
 
-(defn stream-navdata [socket packet]
+(defn stream-navdata [_ socket packet]
   (do
     (receive-navdata socket packet)
     (parse-navdata (get-navdata-bytes packet))
@@ -65,16 +66,16 @@
     (log/info (log-goal-info))
     (if @stop-navstream
       (log/info "navstream-ended")
-      (recur socket packet))))
+      (recur nil socket packet))))
 
 (defn start-streaming-navdata [navdata-socket host port]
   (let [ receive-data (byte-array 2048)
         nav-datagram-receive-packet (new-datagram-packet receive-data host port)]
     (do
       (log/info "Starting navdata stream")
+      (swap! nav-data {})
       (.setSoTimeout navdata-socket 1000)
-      (future (stream-navdata navdata-socket
-                              nav-datagram-receive-packet))
+      (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
 

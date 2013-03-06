@@ -21,8 +21,6 @@
 (drone :hover-on-roundel)
 ;; This puts the drone into a mode where it will hover on the roundel
 ;; and follow it around
-(drone :free-flight)
-;; This puts the drone back into a state where it accepts movement commands
 (drone :land)
 
 (end-navstream)  ;; this ends the logging
