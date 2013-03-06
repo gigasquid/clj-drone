@@ -134,7 +134,7 @@
 
 
 (fact "about stream-navdata"
-      (stream-navdata socket packet) => anything
+      (stream-navdata nil socket packet) => anything
       (provided
        (receive-navdata anything anything) => 1
        (get-navdata-bytes anything) => nav-input)
