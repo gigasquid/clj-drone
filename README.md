@@ -83,7 +83,10 @@ Visual tag targeting commands
 (drone :target-roundel-v) ;=> detects the roundel tag on the vertical camera
 (drone :target-color-green) ;=> detects the green indoor/outhull hull tags
 (drone :target-color-yellow) ;=> detects the yellow indoor/outhull hull tags
-(drone :target-color-blue) ;=> detects the blue indoor/outhull hull tags
+(drone :target-color-blue) ;=> detects the blue indoor/outhull hull
+tags
+(drone :hover-on-roundel) ;=> puts the drone in a mode where it will follow the roundel on the ground
+(drone :free-flight) ;=> puts the drone back in normal mode accepting movement commands
 ````
 
 Animations or Tricks
