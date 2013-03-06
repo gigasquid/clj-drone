@@ -41,5 +41,9 @@
                                   :value "\"15,5000\""}
     :anim-flip-right {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
                       :value "\"19,15\""}
+    :hover-on-roundel {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
+                       :value "\"2\""}
+    :free-flight {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
+                         :value "\"0\""}
     :control-ack     {:command-class "AT*CTRL" :value 0}
     })
