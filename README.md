@@ -238,7 +238,7 @@ program:
 Why shouldn't the AR drone have goals and beliefs?
 Inspired by John McCarthy's
 [Ascribing Mental Qualities to Machines](http://www-formal.stanford.edu/jmc/ascribing/ascribing.html)
-, the AR drone can execute behavoir based on defined goals and beliefs
+, the AR drone can execute behavior based on defined goals and beliefs
 and log its progress in the drone.log.  The way it works is the
 function that continually processes the navigation input, looks at the
 atom that holds the list of the current goals.  Currently, the drone
