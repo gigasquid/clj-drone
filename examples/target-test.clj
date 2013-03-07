@@ -17,6 +17,7 @@
 ;; watch the drone.log file and move the drone above the roundel
 ;; target and put the hull in front of the horizontal camera
 (drone :take-off)
+(drone-do-for 2 :up 0.3)
 ;;;
 (drone :hover-on-roundel)
 ;; This puts the drone into a mode where it will hover on the roundel
