@@ -98,6 +98,15 @@ Animations or Tricks
 (drone :anim-flip-right) ;=> Classic flip goodness
 ````
 
+LED Animations
+`````clojure
+(drone :led_blink_green_red) ;=> blink leds red green for 1 sec
+(drone :led_blink_green) ;=> blink leds green for 1 sec
+(drone :led_blink_red) ;=> blink leds red for 1 sec
+(drone :led_blink_orange) ;=> blink leds orange for 1 sec
+(drone :led_blink_snake) ;=> snake blink leds red green for 1 sec
+````
+
 ## Navigation Data
 To start receiving the navigation data, you must issue the command.
 ````clojure

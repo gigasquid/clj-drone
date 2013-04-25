@@ -41,9 +41,20 @@
                                   :value "\"15,5000\""}
     :anim-flip-right {:command-class "AT*CONFIG" :option "\"control:flight_anim\""
                       :value "\"19,15\""}
+    :led_blink_green_red {:command-class "AT*CONFIG" :option "\"leds:leds_anim\""
+                          :value "\"0,1073741824,1\""}
+    :led_blink_green {:command-class "AT*CONFIG" :option "\"leds:leds_anim\""
+                      :value "\"1,1073741824,1\""}
+    :led_blink_red {:command-class "AT*CONFIG" :option "\"leds:leds_anim\""
+                    :value "\"2,1073741824,1\""}
+    :led_blink_orange {:command-class "AT*CONFIG" :option "\"leds:leds_anim\""
+                       :value "\"3,1073741824,1\""}
+    :led_blink_snake {:command-class "AT*CONFIG" :option "\"leds:leds_anim\""
+                       :value "\"4,1073741824,1\""}
     :hover-on-roundel {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
                        :value "\"2\""}
     :free-flight {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
                          :value "\"0\""}
     :control-ack     {:command-class "AT*CTRL" :value 0}
+
     })
