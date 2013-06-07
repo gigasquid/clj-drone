@@ -25,3 +25,9 @@
   (read-header testvideo) => (contains {:display-width 640})
   (read-header testvideo) => (contains {:display-height 360})
   (read-header testvideo) => (contains {:frame-number 1866}))
+
+(fact "about header-size"
+  (header-size testvideo) => 68)
+
+(fact "about payload-size"
+  (payload-size testvideo) => 19125)
