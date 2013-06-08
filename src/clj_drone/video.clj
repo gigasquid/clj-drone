@@ -4,11 +4,13 @@
   (:require [clj-drone.core :refer :all]
             [clj-drone.navdata :refer :all]))
 
-
+;ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
 (def video-socket (DatagramSocket. ))
 (def stream (atom true))
-(def video-output (FileOutputStream. "test.out"))
+(def header-size 68)
+(declare skt)
+(def video-agent (agent 0))
 
 ;;wakes it up
 
@@ -19,10 +21,12 @@
   (def video-output (FileOutputStream. "test.out")))
 
 
-(defn read-video []
-  (def bvideo (byte-array (* 100 1024)))
+(defn read-from-input [size]
+  (def bvideo (byte-array size))
   (.read (.getInputStream skt) bvideo))
-;; now read the data
+
+(defn read-header []
+  (read-from-input header-size))
 
 (defn read-signature [in]
   (String. (byte-array (map #(nth in %1) [0 1 2 3]))))
@@ -30,16 +34,16 @@
 (defn get-uint8 [ba offset]
   (bytes-to-int ba offset 1))
 
-(defn read-header [in]
-  (let [version (get-uint8 bvideo 4)
-        codec (get-uint8 bvideo 5)
-        header-size (get-short bvideo 6)
-        payload-size (get-int bvideo 8)
-        encoded-width (get-short bvideo 12)
-        encoded-height (get-short bvideo 14)
-        display-width (get-short bvideo 16)
-        display-height (get-short bvideo 18)
-        frame-number (get-int bvideo 20)]
+(defn get-header [in]
+  (let [version (get-uint8 in 4)
+        codec (get-uint8 in 5)
+        header-size (get-short in 6)
+        payload-size (get-int in 8)
+        encoded-width (get-short in 12)
+        encoded-height (get-short in 14)
+        display-width (get-short in 16)
+        display-height (get-short in 18)
+        frame-number (get-int in 20)]
     {:version version
      :codec codec
      :header-size header-size
@@ -50,36 +54,62 @@
      :display-height display-height
      :frame-number frame-number}))
 
-(defn header-size [in]
-  (:header-size (read-header in)))
-
 (defn payload-size [in]
-  (:payload-size (read-header in)))
+  (:payload-size (get-header in)))
+
+(defn read-payload [size]
+  (read-from-input size))
+
+(defn read-frame []
+  (when (> (read-header) -1)
+   (do
+     (println (str  "payload sig " (read-signature bvideo)))
+     (println (str  "payload size is " (payload-size bvideo)))
+     (if (= "PaVE" (read-signature bvideo))
+       (do
+         (println "writing payload")
+         (read-payload (payload-size bvideo))
+         (write-payload bvideo))
+       (println "skipping")))))
 
 (defn write-payload [in]
-  (when (= (read-signature in) "PaVE")
-   (do
-     (.write video-output
-             (byte-array
-              (map byte
-                   (reduce #(conj %1 (nth bvideo (+ (header-size in) %2))) [] (range 0 (payload-size in)))))))))
+  (.write video-output in))
 
-
-(defn stream-video []
-  (when @stream
+(defn stream-video [_]
+  (def video-output (FileOutputStream. "vid.h264"))
+  (if (read-frame)
     (do
-      (read-video)
-      (write-payload bvideo)
-      (recur))))
+      (recur nil))))
 
 
-;(init-video-stream)
-;(read-video)
+
+;; This works
+; (init-video-stream)
+;;   (read-header)
+ ;;  (read-signature bvideo)
+ ;;  (payload-size bvideo)
+ ;; (read-payload (payload-size bvideo))
+ ;; (write-payload bvideo)
+
+;;(read-frame)
+
 ;(write-payload bvideo)
-;(read-signature bvideo)
-;(payload-size bvideo)
 
-;(future (stream-video))
+
+;; (stream-video nil)
+;(send-off video-agent stream-video)
+
+
+;(agent-errors video-agent)
+
+
+
+;; (read-frame)
+;(restart-agent video-agent 0)
+
+
+
+
 
 
 
