@@ -60,8 +60,11 @@
 (defn read-payload [size]
   (read-from-input size))
 
+(defn write-payload [in]
+  (.write video-output in))
+
 (defn read-frame []
-  (when (> (read-header) -1)
+  (if (> (read-header) -1)
    (do
      (println (str  "payload sig " (read-signature bvideo)))
      (println (str  "payload size is " (payload-size bvideo)))
@@ -70,22 +73,29 @@
          (println "writing payload")
          (read-payload (payload-size bvideo))
          (write-payload bvideo))
-       (println "skipping")))))
+       (println "skipping")))
+   (do
+     (println "waking up....")
+     (def skt (Socket. default-drone-ip 5555))
+     (init-streaming-navdata video-socket drone-host 5555))))
 
-(defn write-payload [in]
-  (.write video-output in))
 
 (defn stream-video [_]
   (def video-output (FileOutputStream. "vid.h264"))
-  (if (read-frame)
-    (do
-      (recur nil))))
+  (while @stream (do
+                   (read-frame)
+                   (Thread/sleep 5))))
 
 
 
 ;; This works
-; (init-video-stream)
-;;   (read-header)
+;; (do
+;;   (init-video-stream)
+;;   (send-off video-agent stream-video))
+
+
+ ; (read-header)
+
  ;;  (read-signature bvideo)
  ;;  (payload-size bvideo)
  ;; (read-payload (payload-size bvideo))
@@ -97,10 +107,15 @@
 
 
 ;; (stream-video nil)
-;(send-off video-agent stream-video)
+;(reset! stream false)
 
 
-;(agent-errors video-agent)
+;(reset! stream true)
+
+
+
+;(agent-errors video-agent             )
+
 
 
 
