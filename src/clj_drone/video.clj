@@ -1,8 +1,7 @@
 (ns clj-drone.video
   (:import (java.net Socket))
   (:import (java.io FileOutputStream DataOutputStream))
-  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
-            [clj-drone.core :refer :all]))
+  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]))
 
  ;This records raw video to a file called stream.m4v
 ;To convert to video use
@@ -11,25 +10,24 @@
 
 (def stream (atom true))
 (def header-size 68)
-(declare vid-skt)
 (def video-agent (agent 0))
-(def video-output (atom (FileOutputStream. "vid.h264")))
-
+(def vsocket (atom nil))
 
 ;;wakes it up
 
 (defn init-video-stream [host]
-  (def vid-skt (Socket. host 5555))
-  (.setSoTimeout vid-skt 1000)
-  (def dos (DataOutputStream. (.getOutputStream vid-skt)))
-  (do (.write dos (byte-array (map byte [1 0 0 0])))))
+  (do
+    (reset! vsocket (Socket. host 5555))
+    (.setSoTimeout @vsocket 5000)
+    (def dos (DataOutputStream. (.getOutputStream @vsocket)))
+    (.write dos (byte-array (map byte [1 0 0 0])))))
 
-(defn read-from-input [size]
+(defn read-from-input [size video-socket]
   (def bvideo (byte-array size))
-  (.read (.getInputStream vid-skt) bvideo))
+  (.read (.getInputStream video-socket) bvideo))
 
 (defn read-header []
-  (read-from-input header-size))
+  (read-from-input header-size @vsocket))
 
 (defn read-signature [in]
   (String. (byte-array (map #(nth in %1) [0 1 2 3]))))
@@ -61,35 +59,43 @@
   (:payload-size (get-header in)))
 
 (defn read-payload [size]
-  (read-from-input size))
+  (read-from-input size @vsocket))
 
-(defn write-payload [in]
-  (.write @video-output in))
+(defn write-payload [video out]
+  (.write out video))
 
-(defn read-frame [host]
+(defn read-frame [host out]
   (if (> (read-header) -1)
     (if (= "PaVE" (read-signature bvideo))
       (do
         (read-payload (payload-size bvideo))
-        (write-payload bvideo)))
-    (init-video-stream host)))
+        (write-payload bvideo out))
+      (do (println "not a pave")))
+    (do (println "disconnected")
+        (init-video-stream host)
+        (println (str "reading header: "(read-header)))
+        (if (= "PaVE" (read-signature bvideo))
+          (do
+            (println "yes!")
+            (read-payload (payload-size bvideo))
+            (write-payload bvideo out))
+          (println "oh no not-a pave")
+            ))))
 
-(defn stream-video [_ host]
+(defn stream-video [_ host out]
   (while @stream (do
-                   (read-frame host)
+                   (read-frame host out)
                    (Thread/sleep 30))))
 
 (defn end-video []
-  (reset! stream false)
-  (.close @video-output))
+  (reset! stream false))
 
 
 (defn start-video [host]
   (do
     (reset! stream true)
-    (reset! video-output (FileOutputStream. "vid.h264"))
     (Thread/sleep 30)
-    (send video-agent stream-video host)))
+    (send video-agent stream-video host (FileOutputStream. "vid.h264"))))
 
 ;; (drone-initialize)
 ;; (init-video-stream "192.168.1.1")
