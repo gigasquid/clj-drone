@@ -1,8 +1,7 @@
 (ns clj-drone.video
   (:import (java.net Socket))
   (:import (java.io FileOutputStream DataOutputStream))
-  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
-            [clj-drone.core :refer :all]))
+  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]))
 
  ;This records raw video to a file called stream.m4v
 ;To convert to video use
@@ -18,11 +17,10 @@
 ;;wakes it up
 
 (defn init-video-stream [host]
-  (drone-initialize)
   (def vid-skt (Socket. host 5555))
   (.setSoTimeout vid-skt 1000)
   (def dos (DataOutputStream. (.getOutputStream vid-skt)))
-  (.write dos (byte-array (map byte [1 0 0 0]))))
+  (do (.write dos (byte-array (map byte [1 0 0 0])))))
 
 (defn read-from-input [size]
   (def bvideo (byte-array size))
@@ -69,9 +67,9 @@
 (defn read-frame []
   (when (> (read-header) -1)
     (if (= "PaVE" (read-signature bvideo))
-      (read-payload (payload-size bvideo))
-      (write-payload bvideo))))
-
+      (do
+        (read-payload (payload-size bvideo))
+        (write-payload bvideo)))))
 
 (defn stream-video [_]
   (while @stream (do
@@ -86,15 +84,16 @@
 (defn start-video []
   (do
     (reset! stream true)
-      (def video-output (FileOutputStream. "vid.h264"))
-      (Thread/sleep 30)
-      (send video-agent stream-video)))
+    (def video-output (FileOutputStream. "vid.h264"))
+    (Thread/sleep 30)
+    (send video-agent stream-video)))
 
 ;; (drone-initialize)
 ;; (init-video-stream drone-host)
  ;(start-video)
 ;(end-video)
 ;(read-frame)
+
 
 
 

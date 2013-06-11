@@ -11,3 +11,5 @@ pom.xml
 logs/drone.log
 drone.log
 examples/nav_debug.clj
+home.m4v
+vid.h264
