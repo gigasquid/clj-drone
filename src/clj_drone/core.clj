@@ -69,7 +69,7 @@
       (recur nil socket packet))))
 
 (defn start-streaming-navdata [navdata-socket host port]
-  (let [ receive-data (byte-array 2048)
+  (let [receive-data (byte-array 2048)
         nav-datagram-receive-packet (new-datagram-packet receive-data host port)]
     (do
       (log/info "Starting navdata stream")
@@ -80,11 +80,8 @@
 
 
 (defn init-streaming-navdata [navdata-socket host port]
-  (let [ send-data (byte-array (map byte [1 0 0 0]))
-        nav-datagram-send-packet (new-datagram-packet send-data host port)
-        receive-data (byte-array 2048)
-        nav-datagram-receive-packet (new-datagram-packet receive-data host port)
-        ]
+  (let [send-data (byte-array (map byte [1 0 0 0]))
+        nav-datagram-send-packet (new-datagram-packet send-data host port)]
     (do
       (reset-navstream)
       (.setSoTimeout navdata-socket 1000)

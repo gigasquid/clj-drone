@@ -1,29 +1,33 @@
 (ns clj-drone.video
-  (:import (java.net DatagramPacket DatagramSocket InetAddress Socket))
-  (:import (java.io ByteArrayInputStream InputStreamReader FileOutputStream BufferedOutputStream))
+  (:import (java.net DatagramPacket DatagramSocket InetAddress InetSocketAddress Socket))
+  (:import (java.nio.channels SocketChannel))
+  (:import (java.nio ByteBuffer))
+  (:import (java.io ByteArrayInputStream InputStreamReader FileOutputStream BufferedOutputStream DataOutputStream))
   (:require [clj-drone.core :refer :all]
             [clj-drone.navdata :refer :all]))
 
 ;ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
-(def video-socket (DatagramSocket. ))
+
 (def stream (atom true))
 (def header-size 68)
-(declare skt)
+(declare vid-skt)
 (def video-agent (agent 0))
 
 ;;wakes it up
 
 (defn init-video-stream []
-  (drone-initialize)
-  (def skt (Socket. default-drone-ip 5555))
-  (init-streaming-navdata video-socket drone-host 5555)
-  (def video-output (FileOutputStream. "test.out")))
+  ;(drone-initialize)
+  (def vid-skt (Socket. default-drone-ip 5555))
+  (.setSoTimeout vid-skt 1000)
+  (def dos (DataOutputStream. (.getOutputStream vid-skt)))
+  (.write dos (byte-array (map byte [1 0 0 0])))
+)
 
 
 (defn read-from-input [size]
   (def bvideo (byte-array size))
-  (.read (.getInputStream skt) bvideo))
+  (.read (.getInputStream vid-skt) bvideo))
 
 (defn read-header []
   (read-from-input header-size))
@@ -66,61 +70,42 @@
 (defn read-frame []
   (if (> (read-header) -1)
    (do
-     (println (str  "payload sig " (read-signature bvideo)))
-     (println (str  "payload size is " (payload-size bvideo)))
+     ;(println (str  "payload sig " (read-signature bvideo)))
+     ;(println (str  "payload size is " (payload-size bvideo)))
      (if (= "PaVE" (read-signature bvideo))
        (do
-         (println "writing payload")
+         ;(println "writing payload")
          (read-payload (payload-size bvideo))
          (write-payload bvideo))
-       (println "skipping")))
+       ;(println "skipping")
+       ))
    (do
-     (println "waking up....")
-     (def skt (Socket. default-drone-ip 5555))
-     (init-streaming-navdata video-socket drone-host 5555))))
+     ;(println "waking up....")
+     (init-video-stream))))
 
 
 (defn stream-video [_]
-  (def video-output (FileOutputStream. "vid.h264"))
   (while @stream (do
                    (read-frame)
-                   (Thread/sleep 5))))
+                   (Thread/sleep 30))))
+
+(defn end-video []
+  (reset! stream false)
+  (.close video-output))
 
 
+(defn start-video []
+  (do
+    (reset! stream true)
+      (def video-output (FileOutputStream. "vid.h264"))
+      (Thread/sleep 30)
+      (send video-agent stream-video)))
 
-;; This works
-;; (do
-;;   (init-video-stream)
-;;   (send-off video-agent stream-video))
-
-
- ; (read-header)
-
- ;;  (read-signature bvideo)
- ;;  (payload-size bvideo)
- ;; (read-payload (payload-size bvideo))
- ;; (write-payload bvideo)
-
-;;(read-frame)
-
-;(write-payload bvideo)
+;(init-video-stream)
+;(start-video)
+;(end-video)
 
 
-;; (stream-video nil)
-;(reset! stream false)
-
-
-;(reset! stream true)
-
-
-
-;(agent-errors video-agent             )
-
-
-
-
-;; (read-frame)
-;(restart-agent video-agent 0)
 
 
 
