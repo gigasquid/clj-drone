@@ -1,11 +1,11 @@
 (ns clj-drone.video
-  (:import (java.net DatagramPacket DatagramSocket InetAddress InetSocketAddress Socket))
-  (:import (java.nio.channels SocketChannel))
-  (:import (java.nio ByteBuffer))
-  (:import (java.io ByteArrayInputStream InputStreamReader FileOutputStream BufferedOutputStream DataOutputStream))
-  (:require [clj-drone.core :refer :all]
-            [clj-drone.navdata :refer :all]))
+  (:import (java.net Socket))
+  (:import (java.io FileOutputStream DataOutputStream))
+  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
+            [clj-drone.core :refer :all]))
 
+ ;This records raw video to a file called stream.m4v
+;To convert to video use
 ;ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
 
@@ -13,17 +13,16 @@
 (def header-size 68)
 (declare vid-skt)
 (def video-agent (agent 0))
+(def video-output (FileOutputStream. "vid.h264"))
 
 ;;wakes it up
 
-(defn init-video-stream []
-  ;(drone-initialize)
-  (def vid-skt (Socket. default-drone-ip 5555))
+(defn init-video-stream [host]
+  (drone-initialize)
+  (def vid-skt (Socket. host 5555))
   (.setSoTimeout vid-skt 1000)
   (def dos (DataOutputStream. (.getOutputStream vid-skt)))
-  (.write dos (byte-array (map byte [1 0 0 0])))
-)
-
+  (.write dos (byte-array (map byte [1 0 0 0]))))
 
 (defn read-from-input [size]
   (def bvideo (byte-array size))
@@ -68,20 +67,10 @@
   (.write video-output in))
 
 (defn read-frame []
-  (if (> (read-header) -1)
-   (do
-     ;(println (str  "payload sig " (read-signature bvideo)))
-     ;(println (str  "payload size is " (payload-size bvideo)))
-     (if (= "PaVE" (read-signature bvideo))
-       (do
-         ;(println "writing payload")
-         (read-payload (payload-size bvideo))
-         (write-payload bvideo))
-       ;(println "skipping")
-       ))
-   (do
-     ;(println "waking up....")
-     (init-video-stream))))
+  (when (> (read-header) -1)
+    (if (= "PaVE" (read-signature bvideo))
+      (read-payload (payload-size bvideo))
+      (write-payload bvideo))))
 
 
 (defn stream-video [_]
@@ -101,9 +90,12 @@
       (Thread/sleep 30)
       (send video-agent stream-video)))
 
-;(init-video-stream)
-;(start-video)
+;; (drone-initialize)
+;; (init-video-stream drone-host)
+ ;(start-video)
 ;(end-video)
+;(read-frame)
+
 
 
 
