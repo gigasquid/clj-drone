@@ -13,15 +13,4 @@
 (drone :flat-trim)
 (drone :take-off)
 (drone :land)
-(end-video)
-(read-header)
-
-
-(read-frame
-)
-(read-header)
-(init-video-stream "192.168.1.1")
-(read-header)
-(read-signature bvideo)
-(read-payload (payload-size bvideo))
-
+(drone-end-video)

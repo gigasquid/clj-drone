@@ -4,7 +4,8 @@
              [ clojure.tools.logging :as log]
              [clj-drone.at :refer :all]
              [clj-drone.navdata :refer :all]
-             [clj-drone.goals :refer :all]))
+             [clj-drone.goals :refer :all]
+             [clj-drone.video :refer :all]))
 
 
 (def default-drone-ip "192.168.1.1")
@@ -99,5 +100,8 @@
     (init-streaming-navdata navdata-socket drone-host navdata-port)
     (start-streaming-navdata navdata-socket drone-host navdata-port)))
 
-;; (defn drone-init-video []
-;;   (init-video-stream drone-host))
+(defn drone-init-video []
+  (init-video-stream drone-host))
+
+(defn drone-end-video []
+  (end-video))
