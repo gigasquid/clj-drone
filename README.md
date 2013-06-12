@@ -290,6 +290,27 @@ flight and immediately communicated to the navigation thread. Example:
 For a further example of navigation goal processing, see [example/nav-goals](https://github.com/gigasquid/clj-drone/blob/master/examples/nav_goals.clj)
 
 
+## Saving Video
+The raw video can be saved on a flight (or recorded at any time).
+Example:
+````clojure
+(drone-initialize)
+(drone-init-video)
+(drone-start-video)
+(drone :take-off)
+(drone :land)
+(drone-end-video)
+```clojure
+
+The resulting video file will be saved to vid.h264.  You can convert
+the video into a playable form with ffmpeg.  You need to have [ffmpeg
+installed with ffplay](http://www.renevolution.com/how-to-install-ffmpeg-on-mac-os-x/).
+Converting video can be done with the following command.
+
+   ffmpeg -f h264 -an -i vid.h264 stream.m4v
+
+
+
 ## Running tests
 The tests use [Midje](https://github.com/marick/Midje).  Use the midje
 [lein plugin](https://github.com/marick/Midje/wiki/Lein-midje)
@@ -298,8 +319,7 @@ The tests use [Midje](https://github.com/marick/Midje).  Use the midje
 
 
 ## To do list
-- incoming navigation stream angles
-- incoming video stream
+- processing video streams
 
 ## License
 

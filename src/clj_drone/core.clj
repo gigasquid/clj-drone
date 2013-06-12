@@ -103,5 +103,8 @@
 (defn drone-init-video []
   (init-video-stream drone-host))
 
+(defn drone-start-video []
+  (start-video drone-host))
+
 (defn drone-end-video []
   (end-video))
