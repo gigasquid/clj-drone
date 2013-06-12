@@ -1,7 +1,8 @@
 (ns clj-drone.video
   (:import (java.net Socket))
   (:import (java.io FileOutputStream DataOutputStream))
-  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]))
+  (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
+            [clj-drone.core :refer :all]))
 
  ;This records raw video to a file called stream.m4v
 ;To convert to video use
@@ -72,15 +73,11 @@
         (write-payload bvideo out))
       (do (println "not a pave")))
     (do (println "disconnected")
+        (.close @vsocket)
         (init-video-stream host)
-        (println (str "reading header: "(read-header)))
-        (if (= "PaVE" (read-signature bvideo))
-          (do
-            (println "yes!")
-            (read-payload (payload-size bvideo))
-            (write-payload bvideo out))
-          (println "oh no not-a pave")
-            ))))
+        (Thread/sleep 600)
+        ;(reset! stream false)
+        )))
 
 (defn stream-video [_ host out]
   (while @stream (do
@@ -97,15 +94,25 @@
     (Thread/sleep 30)
     (send video-agent stream-video host (FileOutputStream. "vid.h264"))))
 
-;; (drone-initialize)
+
+;;try future with drone commands? - nope
+
+ ;; (drone-initialize)
 ;; (init-video-stream "192.168.1.1")
 ;; (start-video "192.168.1.1")
 ;; (drone :flat-trim)
 ;; (end-video)
 ;; (read-frame "192.168.1.1")
+
 ;; (read-header)
+;; (read-signature bvideo)
+;;  (read-payload (payload-size bvideo))
+;; (write-payload bvideo out)
+
 ;; bvideo
 ;; (write-payload bvideo)
+;; video-agent
+;; (agent-errors video-agent)
 
 
 
