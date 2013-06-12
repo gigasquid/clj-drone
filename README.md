@@ -300,7 +300,7 @@ Example:
 (drone :take-off)
 (drone :land)
 (drone-end-video)
-```clojure
+```
 
 The resulting video file will be saved to vid.h264.  You can convert
 the video into a playable form with ffmpeg.  You need to have [ffmpeg

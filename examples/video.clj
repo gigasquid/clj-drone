@@ -9,7 +9,6 @@
 (drone-initialize)
 (drone-init-video)
 (drone-start-video)
-(drone :flat-trim)
 (drone :take-off)
 (drone :land)
 (drone-end-video)
