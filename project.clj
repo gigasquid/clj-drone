@@ -7,6 +7,8 @@
                  [log4j/log4j "1.2.16" :exclusions [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
                  [org.slf4j/slf4j-log4j12 "1.6.4"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [ clj-logging-config "1.9.10"]]
+                 [ clj-logging-config "1.9.10"]
+                 [opencv "2.4.5"]]
+  :jvm-opts [~(str "-Djava.library.path=opencv/")]
   :profiles {:dev {:dependencies [[midje "1.4.0"]]
                  :plugins [[lein-midje "2.0.1"]]}})
