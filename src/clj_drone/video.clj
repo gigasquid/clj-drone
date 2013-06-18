@@ -68,9 +68,10 @@ pointer ;=> 21490
 (FrameUtils/YUV2RGB picture buffer)
 
 (.write (FileOutputStream. "coulditbe.png" (map byte buffer)))
- BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        image.setRGB(startX, startY, w, h, rgbArray, offset, scansize);
+(def image (BufferedImage. (.imageWidth picture) (.imageHeight picture) BufferedImage/TYPE_INT_RGB))
+(.setRGB image 0 0 (.imageWidth picture) (.imageHeight picture) buffer 0 (.imageWidth picture))
 
+(def my-first-decoded-png (ImageIcon. image))
 ;;;;;
 
 
@@ -103,7 +104,7 @@ pointer ;=> 21490
   (do
     (.setIcon label icon)))
 
-(view-image testimage)
+(view-image my-first-decoded-png)
  ;(update-image testimage)
 
 (conch/programs ffmpeg)
