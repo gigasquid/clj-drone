@@ -1,128 +1,44 @@
 (ns clj-drone.video
   (:import (java.net Socket))
-  (:import (java.io FileOutputStream DataOutputStream ByteArrayInputStream ByteArrayOutputStream FileInputStream DataInputStream))
+  (:import (java.io FileOutputStream DataOutputStream))
   (:import javax.swing.JFrame
-           javax.swing.JPanel
-           javax.swing.ImageIcon
-           javax.swing.JLabel
-           java.awt.FlowLayout
-           java.awt.Dimension
-           java.awt.Container
-           javax.imageio.ImageIO
-           java.awt.image.BufferedImage
-           )
-  (:import com.twilight.h264.decoder.AVFrame
-           com.twilight.h264.decoder.AVPacket
-           com.twilight.h264.decoder.H264Decoder
-           com.twilight.h264.decoder.MpegEncContext
-           com.twilight.h264.player.FrameUtils
-           java.util.Arrays)
+           javax.swing.JPanel)
   (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
-            [me.raynes.conch :as conch]))
+            [clj-drone.decode :refer :all]))
 
- ;This records raw video to a file called stream.m4v
+ ;This can records raw video to a file called stream.m4v
 ;To convert to video use
-                                        ;ffmpeg -f h264 -an -i
-                                        ;vid.h264 stream.m4v
-
-;;;
-;;getting input data in the right form
-;(def ba (byte-array 21490))
-;(def filein (DataInputStream. (FileInputStream. "good.h264")))
-;(.read filein ba)
-
-;;;
-
-(def first-frame (atom true))
-
-(defn init-decoder []
-  (do
-    (def INBUF_SIZE 65535)
-    (def inbuf-int (int-array (+ INBUF_SIZE MpegEncContext/FF_INPUT_BUFFER_PADDING_SIZE)))
-    (def avpkt (AVPacket.))
-    (.av_init_packet avpkt)
-
-    (def codec (H264Decoder.))
-    (if (nil? codec) (println "Codec not found"))
-    (def c (MpegEncContext/avcodec_alloc_context))
-    (def picture (AVFrame/avcodec_alloc_frame))
+;ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
 
-    (if (not (= 0 (bit-and (.capabilities codec) H264Decoder/CODEC_CAP_TRUNCATED)))
-      (println "need to configure CODEC_FLAG_TRUNCATED"))
-    (if (< (.avcodec_open c codec) 0)
-      (println "Could not open codec"))))
-
-
-(defn to-ba-int [b]
-  (doall (for [i (range 0 (count b))]
-     (aset-int inbuf-int i (bit-and 0xFF (nth b i))))))
-
-(defn convert! [got-picture]
-  (let [len (.avcodec_decode_video2 c picture got-picture avpkt)]
-    len))
-
-(defn get-image-icon [picture buffer]
-      (let [image  (BufferedImage.
-                    (.imageWidth picture) (.imageHeight picture) BufferedImage/TYPE_INT_RGB)]
-        (do
-          (.setRGB
-           image 0 0 (.imageWidth picture) (.imageHeight picture) buffer 0 (.imageWidth picture))
-          (ImageIcon. image))))
-
-(defn convert-frame [b]
-  (do
-    (def got-picture (int-array [0]))
-    (to-ba-int b)
-    (set! (.size avpkt) (count b))
-    (set! (.data_base avpkt) inbuf-int)
-    (set! (.data_offset avpkt) 0)
-    (if (> (convert! got-picture) 0)
-      (if (first got-picture)
-        (let [ picture (.displayPicture (.priv_data c))
-              buffer-size (* (.imageHeight picture) (.imageWidth picture))
-              buffer (int-array buffer-size)
-              ]
-          (do
-            (FrameUtils/YUV2RGB picture buffer)
-            (get-image-icon picture buffer)
-            )
-          )
-        )
-      (println "Could not decode frame"))))
 
 ;;;;;
 
-
-(def frame (JFrame. "Drone view"))
+(def window (JFrame. "test"))
 (def view (JPanel. ))
-
-(defn view-image [icon]
-  (do
-    (def label (JLabel.))
-    (.setIcon label icon)
-    (.setLayout view (FlowLayout.))
-    (.add view label)
-    (def dimension (Dimension. (.getIconWidth icon) (.getIconHeight icon)))
-    (.setPreferredSize view dimension)
-    (.setMaximumSize view dimension)
-    (.setMinimumSize view dimension)
-    (def contentPane (.getContentPane frame))
-    (.setLayout contentPane (FlowLayout.))
-    (.add contentPane view)
-    (.setDefaultCloseOperation frame JFrame/EXIT_ON_CLOSE)
-    (.pack frame)
-    (.setVisible frame true)))
-
-(defn update-image [icon]
-  (do
-    (.setIcon label icon)))
-
-
 (def stream (atom true))
 (def header-size 68)
 (def video-agent (agent 0))
 (def vsocket (atom nil))
+(def save-video (atom false))
+
+(defn configure-save-video [b]
+  (reset! save-video b))
+
+(defn setup-viewer []
+  (def window (JFrame. "test"))
+  (def view (JPanel. ))
+  (doto window
+    (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)
+    (.setBounds 30 30 640 360))
+  (.add (.getContentPane window) view)
+  (.setVisible window true)
+  (def g (.getGraphics view)))
+
+(defn update-image [bi]
+  (do
+    (.drawImage g bi 10 10 view)))
+
 
 ;;wakes it up
 
@@ -204,18 +120,17 @@
   (.write out video))
 
 (defn display-frame [video]
-  (if @first-frame
-    (do
-      (reset! first-frame false)
-      (view-image (convert-frame video)))
-    (update-image (convert-frame video))))
+  (try
+    (do (update-image (convert-frame video)))
+    (catch Exception e (println (str "Error displaying frame - skipping " e)))))
 
 (defn read-frame [host out]
   (if (> (read-header) -1)
     (if (= "PaVE" (read-signature bvideo))
       (do
         (read-payload (payload-size bvideo))
-        (write-payload bvideo out)
+        (when out
+          (write-payload bvideo out))
         (display-frame bvideo)
         )
       (do (println "not a pave")))
@@ -237,42 +152,22 @@
 (defn start-video [host]
   (do
     (reset! stream true)
-    (Thread/sleep 30)
-    (send video-agent stream-video host (FileOutputStream. "vid.h264"))))
-
-
+    (Thread/sleep 40)
+    ;catch up to preset
+    (send video-agent stream-video host (when @save-video
+                                          (FileOutputStream. "vid.h264")))))
 
 ;(init-decoder)
+;(setup-viewer)
 ;(init-video-stream "192.168.1.1")
 ;(start-video "192.168.1.1")
 ;(agent-errors video-agent)
+;(restart-agent video-agent 0)
 ;(end-video)
 
 
-;(read-frame "192.168.1.1" (FileOutputStream. "next.h264"))
-;bvideo
- ;(convert-frame bvideo)
 
 
-;; (init-decoder)
-;; (def my-first-decoded-png (convert-frame bvideo))
-;; (view-image my-first-decoded-png)
-;; (update-image my-first-decoded-png)
-
-
-
-
-
-; (read-payload (payload-size bvideo))
-; (write-payload bvideo  (FileOutputStream. "newframe.h264"))
-
-;(display-frame bvideo)
-;(nth bvideo 4)
-
-;(display-frame bvideo)
-;(start-video "192.168.1.1")
-;(end-video)
-;(nth bvideo 3)
 
 
 
