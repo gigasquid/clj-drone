@@ -13,13 +13,12 @@
     java.io.File))
 
 (def face-detections (atom []))
+(declare front-face-classifier)
 
 (defn create-classifier []
   (CascadeClassifier.
      (.getPath (clojure.java.io/resource
-                "lbpcascade_frontalface.xml" ))))
-
-(def front-face-classifier (create-classifier))
+                "haarcascade_frontalface_alt.xml" ))))
 
 (defn load-image [filename]
   (Highgui/imread filename))
@@ -55,7 +54,8 @@
 ;(process-and-return-image "opencvin.png")
 
 (defn init-opencv []
-  (clojure.lang.RT/loadLibrary Core/NATIVE_LIBRARY_NAME))
+  (clojure.lang.RT/loadLibrary Core/NATIVE_LIBRARY_NAME)
+  (def front-face-classifier (create-classifier)))
 
 
 

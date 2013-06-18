@@ -166,15 +166,20 @@
     (send video-agent stream-video host (when @save-video
                                           (FileOutputStream. "vid.h264")))))
 
-(init-decoder)
-(init-opencv)
-(setup-viewer)
-(init-video-stream "192.168.1.1")
-(read-frame "192.168.1.1" nil)
-(start-video "192.168.1.1")
+;(init-decoder)
+
+;(init-opencv)
+
+;(setup-viewer)
+;(init-video-stream "192.168.1.1")
+;(read-frame "192.168.1.1" nil)
+;(start-video "192.168.1.1")
 ;(agent-errors video-agent)
 ;(restart-agent video-agent 0)
-(end-video)
+;(end-video)
+
+
+
 
 
 
