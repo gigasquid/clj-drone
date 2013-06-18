@@ -97,9 +97,6 @@
 (def frame (JFrame. "Drone view"))
 (def view (JPanel. ))
 
-(def lena (ImageIcon. "resources/lena.png"))
-(def testimage (ImageIcon. "test.png"))
-
 (defn view-image [icon]
   (do
     (def label (JLabel.))

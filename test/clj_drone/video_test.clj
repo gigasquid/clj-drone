@@ -15,19 +15,19 @@
   (read-signature (make-bytes signature)) => "PaVE"
   (read-signature testvideo) => "PaVE")
 
-(fact "about read-header"
-  (read-header testvideo) => (contains {:version 2})
-  (read-header testvideo) => (contains {:codec 4})
-  (read-header testvideo) => (contains {:header-size 68})
-  (read-header testvideo) => (contains {:payload-size 19125})
-  (read-header testvideo) => (contains {:encoded-width 640})
-  (read-header testvideo) => (contains {:encoded-height 368})
-  (read-header testvideo) => (contains {:display-width 640})
-  (read-header testvideo) => (contains {:display-height 360})
-  (read-header testvideo) => (contains {:frame-number 1866}))
+(fact "about get-header"
+  (get-header testvideo) => (contains {:version 2})
+  (get-header testvideo) => (contains {:codec 4})
+  (get-header testvideo) => (contains {:header-size 68})
+  (get-header testvideo) => (contains {:payload-size 19125})
+  (get-header testvideo) => (contains {:encoded-width 640})
+  (get-header testvideo) => (contains {:encoded-height 368})
+  (get-header testvideo) => (contains {:display-width 640})
+  (get-header testvideo) => (contains {:display-height 360})
+  (get-header testvideo) => (contains {:frame-number 1866}))
 
 (fact "about header-size"
-  (header-size testvideo) => 68)
+  header-size => 68)
 
 (fact "about payload-size"
   (payload-size testvideo) => 19125)
