@@ -23,58 +23,75 @@
  ;This records raw video to a file called stream.m4v
 ;To convert to video use
                                         ;ffmpeg -f h264 -an -i
-                     ;vid.h264 stream.m4v
+                                        ;vid.h264 stream.m4v
 
-(def INBUF_SIZE 65535)
-(def inbuf-int (int-array (+ INBUF_SIZE MpegEncContext/FF_INPUT_BUFFER_PADDING_SIZE)))
-(def avpkt (AVPacket.))
-(.av_init_packet avpkt)
+;;;
+;;getting input data in the right form
+;(def ba (byte-array 21490))
+;(def filein (DataInputStream. (FileInputStream. "good.h264")))
+;(.read filein ba)
 
-(def codec (H264Decoder.))
-(if (nil? codec) (println "Codec not found"))
-(def c (MpegEncContext/avcodec_alloc_context))
-(def picture (AVFrame/avcodec_alloc_frame))
+;;;
 
+(def first-frame (atom true))
 
-(if (not (= 0 (bit-and (.capabilities codec) H264Decoder/CODEC_CAP_TRUNCATED)))
-  (println "need to configure CODEC_FLAG_TRUNCATED"))
-(if (< (.avcodec_open c codec) 0)
-  (println "Could not open codec"))
+(defn init-decoder []
+  (do
+    (def INBUF_SIZE 65535)
+    (def inbuf-int (int-array (+ INBUF_SIZE MpegEncContext/FF_INPUT_BUFFER_PADDING_SIZE)))
+    (def avpkt (AVPacket.))
+    (.av_init_packet avpkt)
 
-(def fin (DataInputStream. (FileInputStream. "good.h264")))
-(defn to-fin-int [idx]
-  (let [x (.read fin)]
-    (if (not (= -1 x))
-      (do (aset-int inbuf-int idx x)
-          (recur (inc idx)))
-      idx)))
-(def pointer (to-fin-int 0))
-pointer ;=> 21490
-(nth inbuf-int 3)
-
-(set! (.size avpkt) pointer)
-(set! (.data_base avpkt) inbuf-int)
-(set! (.data_offset avpkt) 0)
+    (def codec (H264Decoder.))
+    (if (nil? codec) (println "Codec not found"))
+    (def c (MpegEncContext/avcodec_alloc_context))
+    (def picture (AVFrame/avcodec_alloc_frame))
 
 
-(def got_picture (int-array [0]))
+    (if (not (= 0 (bit-and (.capabilities codec) H264Decoder/CODEC_CAP_TRUNCATED)))
+      (println "need to configure CODEC_FLAG_TRUNCATED"))
+    (if (< (.avcodec_open c codec) 0)
+      (println "Could not open codec"))))
 
-(def len (.avcodec_decode_video2 c picture got_picture avpkt)) ;=>
-                                   ;21490
-(first got_picture)
-(def picture (.displayPicture (.priv_data c)))
-(def buffer-size (* (.imageHeight picture) (.imageWidth picture)))
-(def buffer (int-array buffer-size))
-(FrameUtils/YUV2RGB picture buffer)
 
-(.write (FileOutputStream. "coulditbe.png" (map byte buffer)))
-(def image (BufferedImage. (.imageWidth picture) (.imageHeight picture) BufferedImage/TYPE_INT_RGB))
-(.setRGB image 0 0 (.imageWidth picture) (.imageHeight picture) buffer 0 (.imageWidth picture))
+(defn to-ba-int [b]
+  (doall (for [i (range 0 (count b))]
+     (aset-int inbuf-int i (bit-and 0xFF (nth b i))))))
 
-(def my-first-decoded-png (ImageIcon. image))
+(defn convert! [got-picture]
+  (let [len (.avcodec_decode_video2 c picture got-picture avpkt)]
+    len))
+
+(defn get-image-icon [picture buffer]
+      (let [image  (BufferedImage.
+                    (.imageWidth picture) (.imageHeight picture) BufferedImage/TYPE_INT_RGB)]
+        (do
+          (.setRGB
+           image 0 0 (.imageWidth picture) (.imageHeight picture) buffer 0 (.imageWidth picture))
+          (ImageIcon. image))))
+
+(defn convert-frame [b]
+  (do
+    (def got-picture (int-array [0]))
+    (to-ba-int b)
+    (set! (.size avpkt) (count b))
+    (set! (.data_base avpkt) inbuf-int)
+    (set! (.data_offset avpkt) 0)
+    (if (> (convert! got-picture) 0)
+      (if (first got-picture)
+        (let [ picture (.displayPicture (.priv_data c))
+              buffer-size (* (.imageHeight picture) (.imageWidth picture))
+              buffer (int-array buffer-size)
+              ]
+          (do
+            (FrameUtils/YUV2RGB picture buffer)
+            (get-image-icon picture buffer)
+            )
+          )
+        )
+      (println "Could not decode frame"))))
+
 ;;;;;
-
-
 
 
 (def frame (JFrame. "Drone view"))
@@ -103,21 +120,6 @@ pointer ;=> 21490
 (defn update-image [icon]
   (do
     (.setIcon label icon)))
-
-(view-image my-first-decoded-png)
- ;(update-image testimage)
-
-(conch/programs ffmpeg)
-;; ;; (def pngstream (ffmpeg "-i" "vid.h264" "-f" "image2pipe" "-vcodec" "png" "-r" "30" "-" {:seq true}))
-
-;; ;; (first pngstream)
-;; (def rawout (ByteArrayOutputStream.))
-;; (.write rawout bvideo)
-;; (def bi (ImageIO/read rawin))
-;; (nth bvideo 3)
-
-;; (ffmpeg "-i" "newframe.h264" "-f" "image2pipe" "-vcodec" "png" "-r" "5" "yetanother.png")
-
 
 
 (def stream (atom true))
@@ -205,23 +207,20 @@ pointer ;=> 21490
   (.write out video))
 
 (defn display-frame [video]
-  (do
-    (.write (FileOutputStream. "oneframe.h264") bvideo)
-    (Thread/sleep 20)
-    (ffmpeg "-i" "oneframe.h264" "-f" "image2pipe" "-vcodec" "png" "-r" "5" "-y" "flight.png")
-    (Thread/sleep 20)
-    (update-image  (ImageIcon. "flight.png"))
-    ))
+  (if @first-frame
+    (do
+      (reset! first-frame false)
+      (view-image (convert-frame video)))
+    (update-image (convert-frame video))))
 
-(count bvideo)
-
-(get-header bvideo)
 (defn read-frame [host out]
   (if (> (read-header) -1)
     (if (= "PaVE" (read-signature bvideo))
       (do
         (read-payload (payload-size bvideo))
-        (write-payload bvideo out))
+        (write-payload bvideo out)
+        (display-frame bvideo)
+        )
       (do (println "not a pave")))
     (do (println "disconnected")
         (.close @vsocket)
@@ -244,8 +243,29 @@ pointer ;=> 21490
     (Thread/sleep 30)
     (send video-agent stream-video host (FileOutputStream. "vid.h264"))))
 
-(init-video-stream "192.168.1.1")
-(read-frame "192.168.1.1" (FileOutputStream. "good.h264"))
+
+
+;(init-decoder)
+;(init-video-stream "192.168.1.1")
+;(start-video "192.168.1.1")
+;(agent-errors video-agent)
+;(end-video)
+
+
+;(read-frame "192.168.1.1" (FileOutputStream. "next.h264"))
+;bvideo
+ ;(convert-frame bvideo)
+
+
+;; (init-decoder)
+;; (def my-first-decoded-png (convert-frame bvideo))
+;; (view-image my-first-decoded-png)
+;; (update-image my-first-decoded-png)
+
+
+
+
+
 ; (read-payload (payload-size bvideo))
 ; (write-payload bvideo  (FileOutputStream. "newframe.h264"))
 
