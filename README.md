@@ -290,16 +290,27 @@ flight and immediately communicated to the navigation thread. Example:
 For a further example of navigation goal processing, see [example/nav-goals](https://github.com/gigasquid/clj-drone/blob/master/examples/nav_goals.clj)
 
 
+## Viewing Video
+The video can viewed as it goes - We convert the h264 video to png
+frames for display. Here is a sample:
+
+````clojure
+(drone-initialize)
+(init-video (drone-ip drone-host))
+(start-video (drone-ip drone-host))
+(end-video)
+```
+
+
 ## Saving Video
-The raw video can be saved on a flight (or recorded at any time).
+The raw video can be saved on a flight while you are viewing it.
 Example:
 ````clojure
 (drone-initialize)
-(drone-init-video)
-(drone-start-video)
-(drone :take-off)
-(drone :land)
-(drone-end-video)
+(configure-save-video true)
+(init-video (drone-ip drone-host))
+(start-video (drone-ip drone-host))
+(end-video)
 ```
 
 The resulting video file will be saved to vid.h264.  You can convert
@@ -309,12 +320,9 @@ Converting video can be done with the following command.
 
    ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
-## Viewing Video
-The video can viewed as it goes only.
-
 
 ## Running locally
-You need to install the h264 jar locally.  You can use the
+You need to install the h264 (for video conversion) jar locally.  You can use the
 [lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
 in. Run:
 
