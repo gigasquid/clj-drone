@@ -64,4 +64,5 @@
         )
       (println "Could not decode frame"))))
 
+(init-decoder)
 

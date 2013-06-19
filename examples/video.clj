@@ -1,5 +1,6 @@
 (ns clj-drone.example.video
-  (:require [clj-drone.core :refer :all]))
+  (:require [clj-drone.core :refer :all]
+            [clj-drone.video :refer :all]))
 
 ;This records raw video to a file called stream.m4v
 ;To convert to video use
@@ -7,6 +8,7 @@
 
 
 (drone-initialize)
+(configure-save-video true)
 (drone-init-video)
 (drone-start-video)
 (drone :take-off)

@@ -309,6 +309,16 @@ Converting video can be done with the following command.
 
    ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
+## Viewing Video
+The video can viewed as it goes only.
+
+
+## Running locally
+You need to install the h264 jar locally.  You can use the
+[lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
+in. Run:
+
+    lein localrepo install h264/h264-decoder-1.0.jar h264-decoder/h264-decoder 1.0
 
 
 ## Running tests

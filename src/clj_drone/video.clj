@@ -5,8 +5,7 @@
   (:import javax.swing.JFrame
            javax.swing.JPanel)
   (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
-            [clj-drone.decode :refer :all]
-            [clj-drone.opencv :refer :all]))
+            [clj-drone.decode :refer :all]))
 
  ;This can records raw video to a file called stream.m4v
 ;To convert to video use
@@ -21,8 +20,10 @@
 (def stream (atom true))
 (def header-size 68)
 (def video-agent (agent 0))
-(def vsocket (atom nil))
+(def display-agent (agent false))
 (def save-video (atom false))
+(def vsocket (atom nil))
+(def frame-number (atom 0))
 
 (defn configure-save-video [b]
   (reset! save-video b))
@@ -46,17 +47,19 @@
 
 (defn init-video-stream [host]
   (do
-    (reset! vsocket (Socket. host 5555))
-    (.setSoTimeout @vsocket 5000)
-    (def dos (DataOutputStream. (.getOutputStream @vsocket)))
-    (.write dos (byte-array (map byte [1 0 0 0])))))
+    (let [vs (Socket. host 5555)]
+      (.setSoTimeout vs 5000)
+      ;wakes up the socket so that it will continue to stream data
+      (.write (DataOutputStream. (.getOutputStream vs)) (byte-array (map byte [1 0 0 0])))
+      (reset! vsocket vs))))
 
-(defn read-from-input [size video-socket]
-  (def bvideo (byte-array size))
-  (.read (.getInputStream video-socket) bvideo))
+(defn read-from-input [size]
+  (let [bv (byte-array size)]
+    (.read (.getInputStream @vsocket) bv)
+    bv))
 
 (defn read-header []
-  (read-from-input header-size @vsocket))
+  (read-from-input header-size))
 
 (defn read-signature [in]
   (String. (byte-array (map #(nth in %1) [0 1 2 3]))))
@@ -116,7 +119,7 @@
   (:payload-size (get-header in)))
 
 (defn read-payload [size]
-  (read-from-input size @vsocket))
+  (read-from-input size))
 
 (defn write-payload [video out]
   (.write out video))
@@ -127,56 +130,71 @@
 (defn display-frame [video]
   (try
     (let [buff-img (convert-frame video)]
-      (do
-        ;(update-image buff-img)
-        (save-image buff-img)
-        (update-image (process-and-return-image "opencvin.png"))))
+      (future
+        (update-image buff-img)))
     (catch Exception e (println (str "Error displaying frame - skipping " e)))))
 
 (defn read-frame [host out]
-  (if (> (read-header) -1)
-    (if (= "PaVE" (read-signature bvideo))
-      (do
-        (read-payload (payload-size bvideo))
-        (when out
-          (write-payload bvideo out))
-        (display-frame bvideo)
-        )
-      (do (println "not a pave")))
-    (do (println "disconnected")
-        (.close @vsocket)
-        (init-video-stream host)
-        ;need to wait a bit after reconnecting 
-        (Thread/sleep 600))))
+  (try
+    (let [vheader (read-header)]
+     (if (> (count vheader) -1)
+       (if (= "PaVE" (read-signature vheader))
+         (do
+           (let [vpayload (read-payload (payload-size vheader))]
+             (when out
+               (write-payload vpayload out))
+             (display-frame vpayload)))
+         (do (println "not a pave")))
+       (do (println "disconnected")
+           (.close @vsocket)
+           (init-video-stream host)
+                                        ;need to wait a bit after reconnecting 
+           (Thread/sleep 600))))
+    (catch Exception e (println (str "Problem reading frame - skipping " e)))))
 
 (defn stream-video [_ host out]
   (while @stream (do
                    (read-frame host out)
-                   (Thread/sleep 30))))
+                   ;(Thread/sleep 30)
+                   )))
+
 
 (defn end-video []
   (reset! stream false))
 
 
+(defn init-video [host]
+  (init-decoder)
+  (setup-viewer)
+  (init-video-stream host))
+
 (defn start-video [host]
   (do
     (reset! stream true)
     (Thread/sleep 40)
-    ;catch up to preset
+    ;wait for the first frame 
     (send video-agent stream-video host (when @save-video
                                           (FileOutputStream. "vid.h264")))))
 
-;(init-decoder)
 
-;(init-opencv)
+;;Debugging stuffs
 
-;(setup-viewer)
-;(init-video-stream "192.168.1.1")
-;(read-frame "192.168.1.1" nil)
-;(start-video "192.168.1.1")
-;(agent-errors video-agent)
-;(restart-agent video-agent 0)
-;(end-video)
+;; (init-decoder)
+;; (setup-viewer)
+;; (init-video-stream "192.168.1.1")
+;; (start-video "192.168.1.1")
+;; (read-frame "192.168.1.1" nil)
+;; (time (read-frame "192.168.1.1" nil))
+;; (agent-errors video-agent)
+;; (restart-agent video-agent false)
+;; (end-video)
+
+
+
+
+
+
+
 
 
 
