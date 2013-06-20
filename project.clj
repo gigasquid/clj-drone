@@ -8,7 +8,9 @@
                  [org.slf4j/slf4j-log4j12 "1.6.4"]
                  [org.clojure/tools.logging "0.2.3"]
                  [ clj-logging-config "1.9.10"]
+                 [opencv "2.4.5"]
                  [me.raynes/conch "0.5.0"]
                  [h264-decoder "1.0"]]
+  :jvm-opts [~(str "-Djava.library.path=opencv/")]
   :profiles {:dev {:dependencies [[midje "1.4.0"]]
                  :plugins [[lein-midje "2.0.1"]]}})

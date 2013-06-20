@@ -3,9 +3,11 @@
   (:import javax.imageio.ImageIO)
   (:import (java.io FileOutputStream DataOutputStream File))
   (:import javax.swing.JFrame
-           javax.swing.JPanel)
+           javax.swing.JPanel
+           java.awt.FlowLayout)
   (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
-            [clj-drone.decode :refer :all]))
+            [clj-drone.decode :refer :all]
+            [clj-drone.opencv :refer :all]))
 
  ;This can records raw video to a file called stream.m4v
 ;To convert to video use
@@ -24,6 +26,7 @@
 (def save-video (atom false))
 (def vsocket (atom nil))
 (def frame-number (atom 0))
+(def opencv-skip-frames 20)
 
 (defn configure-save-video [b]
   (reset! save-video b))
@@ -130,8 +133,10 @@
 (defn display-frame [video]
   (try
     (let [buff-img (convert-frame video)]
-      (future
-        (update-image buff-img)))
+      (def my-img buff-img)
+      (swap! frame-number inc)
+      (if (= 0 (mod @frame-number opencv-skip-frames))
+        (send display-agent (update-image (process-and-return-image buff-img)))))
     (catch Exception e (println (str "Error displaying frame - skipping " e)))))
 
 (defn read-frame [host out]
@@ -179,15 +184,21 @@
 
 ;;Debugging stuffs
 
-;; (init-decoder)
-;; (setup-viewer)
-;; (init-video-stream "192.168.1.1")
-;; (start-video "192.168.1.1")
-;; (read-frame "192.168.1.1" nil)
-;; (time (read-frame "192.168.1.1" nil))
-;; (agent-errors video-agent)
-;; (restart-agent video-agent false)
-;; (end-video)
+ (init-opencv)
+  (init-decoder)
+(setup-viewer)
+(init-video-stream "192.168.1.1")
+(start-video "192.168.1.1")
+(time (read-frame "192.168.1.1" nil))
+
+;; my-img
+;; (.drawImage g2 my-img 10 10 view1)
+;; (.drawImage (.getGraphics view1) my-img 10 10 view1)
+;; (update-image)
+;; ;; (time (read-frame "192.168.1.1" nil))
+;; (agent-errors display-agent1)
+;; (restart-agent display-agent1  0)
+(end-video)
 
 
 

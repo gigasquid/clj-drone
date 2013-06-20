@@ -60,7 +60,7 @@
                         (Scalar. 0 255 0)))
               (.toArray @face-detections)))
   (Highgui/imwrite "faceDetections.png" image)
-  (ImageIO/read (File. "faceDetections.png")))
+  (convert-mat-to-buffer-image image))
 
 
 (defn process-and-save-image! [filename]
@@ -68,8 +68,8 @@
     (detect-faces! (create-classifier) image)
     (draw-bounding-boxes! image)))
 
-(defn process-and-return-image [filename]
-  (let [image (load-image filename)]
+(defn process-and-return-image [imgbuf]
+  (let [image (convert-buffer-image-to-mat imgbuf :color)]
     (do
       (reset! face-detections (MatOfRect.))
       (detect-faces! front-face-classifier image)
