@@ -12,13 +12,12 @@
    org.opencv.objdetect.CascadeClassifier
    org.opencv.objdetect.Objdetect
    java.awt.image.BufferedImage
+   java.awt.RenderingHints
    javax.imageio.ImageIO
    java.io.File
    java.io.ByteArrayInputStream
    org.opencv.core.Size))
 
-(* 640 360)
-(* 0.25 360)
 
 (defn buf-to-mat [buf type]
   (let [itype (if (= type :gray)  CvType/CV_8UC1  CvType/CV_8UC3)
@@ -30,11 +29,18 @@
 
 (defn convert-buffer-image-to-mat [img type]
   (let [itype (if (= type :gray) BufferedImage/TYPE_BYTE_GRAY BufferedImage/TYPE_3BYTE_BGR)
-        new-frame  (BufferedImage. (.getWidth img) (.getHeight img) itype)
+        w (.getWidth img)
+        h (.getHeight img)
+        nw (/ w 2)
+        nh (/ h 2)
+        new-frame  (BufferedImage. nw nh itype)
         g (.getGraphics new-frame)]
-    (.drawImage g img 0 0 nil)
-    (.dispose g)
-    (buf-to-mat new-frame type)))
+    (doto g
+      (.setRenderingHint RenderingHints/KEY_INTERPOLATION  RenderingHints/VALUE_INTERPOLATION_BILINEAR)
+      (.drawImage img 0 0 nw nh 0 0 w h nil)
+      (.dispose))
+    (buf-to-mat new-frame type))
+  )
 
 (defn convert-mat-to-buffer-image [mat]
   (let [new-mat (MatOfByte.)]
@@ -59,8 +65,8 @@
                      (double 1.2)
                      2
                      Objdetect/CASCADE_DO_CANNY_PRUNING
-                     (Size. 90 90)
-                     (Size. 360 360)))
+                     (Size. 80 80)
+                     (Size. 180 180)))
 (defn draw-bounding-boxes!
   [image]
   (doall (map (fn [rect]
@@ -80,7 +86,7 @@
     (draw-bounding-boxes! image)))
 
 (defn process-and-return-image [imgbuf]
-  (let [image (convert-buffer-image-to-mat imgbuf :color)]
+  (let [image (convert-buffer-image-to-mat imgbuf :gray)]
     (do
       (reset! face-detections (MatOfRect.))
       (detect-faces! front-face-classifier image)

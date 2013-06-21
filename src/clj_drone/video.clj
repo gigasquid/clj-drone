@@ -7,7 +7,8 @@
            java.awt.FlowLayout)
   (:require [clj-drone.navdata :refer [bytes-to-int get-short get-int]]
             [clj-drone.decode :refer :all]
-            [clj-drone.opencv :refer :all]))
+            [clj-drone.opencv :refer :all]
+            [clj-drone.core :refer :all]))
 
  ;This can records raw video to a file called stream.m4v
 ;To convert to video use
@@ -22,7 +23,6 @@
 (def stream (atom true))
 (def header-size 68)
 (def video-agent (agent 0))
-(def display-agent (agent false))
 (def save-video (atom false))
 (def vsocket (atom nil))
 (def frame-number (atom 0))
@@ -128,15 +128,14 @@
   (.write out video))
 
 (defn save-image [bi]
-    (ImageIO/write bi "png" (File. "opencvin.png")))
+  (ImageIO/write bi "png" (File. "opencvin.png")))
 
 (defn display-frame [video]
   (try
     (let [buff-img (convert-frame video)]
       (def my-img buff-img)
       (swap! frame-number inc)
-      (if (= 0 (mod @frame-number opencv-skip-frames))
-        (send display-agent (update-image (process-and-return-image buff-img)))))
+      (future (update-image (process-and-return-image buff-img))))
     (catch Exception e (println (str "Error displaying frame - skipping " e)))))
 
 (defn read-frame [host out]
@@ -177,53 +176,33 @@
   (do
     (reset! stream true)
     (Thread/sleep 40)
-    ;wait for the first frame 
+    ;wait for the first frame
     (send video-agent stream-video host (when @save-video
                                           (FileOutputStream. "vid.h264")))))
 
 
 ;;Debugging stuffs
 
- (init-opencv)
-  (init-decoder)
-(setup-viewer)
-(init-video-stream "192.168.1.1")
-(start-video "192.168.1.1")
-(time (read-frame "192.168.1.1" nil))
+;; ( convert-buffer-image-to-mat my-img :color)
+;; (double (/ 1000 15))
+;; (drone-initialize)
+;; (drone :video-frame-rate-15)
+;;  (init-opencv)
+;; (init-decoder)
+;; (setup-viewer)
+;; (init-video-stream "192.168.1.1")
+;; (start-video "192.168.1.1")
+;; (time (read-frame "192.168.1.1" nil))
+;; (double (/ 1000 15))
 
 ;; my-img
 ;; (.drawImage g2 my-img 10 10 view1)
 ;; (.drawImage (.getGraphics view1) my-img 10 10 view1)
 ;; (update-image)
 ;; ;; (time (read-frame "192.168.1.1" nil))
-;; (agent-errors display-agent1)
+; (agent-errors display-agent)
 ;; (restart-agent display-agent1  0)
-(end-video)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;(end-video)
 
 
 
