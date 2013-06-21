@@ -25,18 +25,20 @@
 (def video-agent (agent 0))
 (def save-video (atom false))
 (def vsocket (atom nil))
-(def frame-number (atom 0))
-(def opencv-skip-frames 20)
+(def opencv (atom false))
 
 (defn configure-save-video [b]
   (reset! save-video b))
+
+(defn configure-opencv [b]
+  (reset! opencv b))
 
 (defn setup-viewer []
   (def window (JFrame. "test"))
   (def view (JPanel. ))
   (doto window
     (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)
-    (.setBounds 30 30 640 360))
+    (.setBounds 30 30 (if @opencv 320 640) (if @opencv 180 360)))
   (.add (.getContentPane window) view)
   (.setVisible window true)
   (def g (.getGraphics view)))
@@ -44,7 +46,6 @@
 (defn update-image [bi]
   (do
     (.drawImage g bi 10 10 view)))
-
 
 ;;wakes it up
 
@@ -134,8 +135,10 @@
   (try
     (let [buff-img (convert-frame video)]
       (def my-img buff-img)
-      (swap! frame-number inc)
-      (future (update-image (process-and-return-image buff-img))))
+      (update-image
+       (if @opencv
+         (process-and-return-image buff-img)
+         buff-img)))
     (catch Exception e (println (str "Error displaying frame - skipping " e)))))
 
 (defn read-frame [host out]
@@ -158,9 +161,7 @@
 
 (defn stream-video [_ host out]
   (while @stream (do
-                   (read-frame host out)
-                   ;(Thread/sleep 30)
-                   )))
+                   (read-frame host out))))
 
 
 (defn end-video []
@@ -183,6 +184,14 @@
 
 ;;Debugging stuffs
 
+;(configure-opencv true)
+;(init-video "192.168.1.1")
+;(start-video "192.168.1.1")
+
+
+
+
+
 ;; ( convert-buffer-image-to-mat my-img :color)
 ;; (double (/ 1000 15))
 ;; (drone-initialize)
@@ -203,6 +212,7 @@
 ; (agent-errors display-agent)
 ;; (restart-agent display-agent1  0)
 ;(end-video)
+
 
 
 
