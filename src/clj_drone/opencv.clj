@@ -10,11 +10,15 @@
    org.opencv.core.Scalar
    org.opencv.highgui.Highgui
    org.opencv.objdetect.CascadeClassifier
+   org.opencv.objdetect.Objdetect
    java.awt.image.BufferedImage
    javax.imageio.ImageIO
    java.io.File
-   java.io.ByteArrayInputStream))
+   java.io.ByteArrayInputStream
+   org.opencv.core.Size))
 
+(* 640 360)
+(* 0.25 360)
 
 (defn buf-to-mat [buf type]
   (let [itype (if (= type :gray)  CvType/CV_8UC1  CvType/CV_8UC3)
@@ -49,7 +53,14 @@
   (Highgui/imread filename))
 
 (defn detect-faces! [classifier image]
-  (.detectMultiScale classifier image @face-detections))
+  (.detectMultiScale classifier
+                     image
+                     @face-detections
+                     (double 1.2)
+                     2
+                     Objdetect/CASCADE_DO_CANNY_PRUNING
+                     (Size. 90 90)
+                     (Size. 360 360)))
 (defn draw-bounding-boxes!
   [image]
   (doall (map (fn [rect]
