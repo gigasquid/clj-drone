@@ -78,7 +78,7 @@
     (do
       (log/info "Starting navdata stream")
       (swap! nav-data {})
-      (.setSoTimeout navdata-socket 1000)
+      (.setSoTimeout navdata-socket 9000)
       (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
@@ -88,7 +88,7 @@
         nav-datagram-send-packet (new-datagram-packet send-data host port)]
     (do
       (reset-navstream)
-      (.setSoTimeout navdata-socket 1000)
+      (.setSoTimeout navdata-socket 9000)
       (send-navdata navdata-socket nav-datagram-send-packet))))
 
 
