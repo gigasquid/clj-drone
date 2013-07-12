@@ -14,7 +14,9 @@
 (def navdata-socket (DatagramSocket. ))
 (def counter (atom 0))
 (def nav-agent (agent {}))
+(def socket-timeout (atom 9000))
 (declare drone)
+
 
 (defn init-logger []
   (log-config/set-logger! :level :debug
@@ -78,7 +80,7 @@
     (do
       (log/info "Starting navdata stream")
       (swap! nav-data {})
-      (.setSoTimeout navdata-socket 9000)
+      (.setSoTimeout navdata-socket @socket-timeout)
       (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
@@ -88,7 +90,7 @@
         nav-datagram-send-packet (new-datagram-packet send-data host port)]
     (do
       (reset-navstream)
-      (.setSoTimeout navdata-socket 9000)
+      (.setSoTimeout navdata-socket @socket-timeout)
       (send-navdata navdata-socket nav-datagram-send-packet))))
 
 
