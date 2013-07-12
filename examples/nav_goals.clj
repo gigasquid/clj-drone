@@ -55,78 +55,15 @@
   (fn [{:keys [control-state]}] (= control-state :landed))
   [ba-flying ba-landing])
 
-;; Detecting Target
 
 
-(def-belief-action ba-no-detect-vertical-target
-  "I do not see a vertical target"
-  (fn [{:keys [targets-num]}]
-    (or (nil? targets-num) (= targets-num 0)))
-  (drone :hover-on-roundel))
-
-(def-goal g-detect-target
-  "I want to detect the vertical target"
-  (fn [{:keys [targets-num]}] (> targets-num 0))
-  [ba-no-detect-vertical-target])
-
-;; Hover on target mode for 1 minutes
-(def-belief-action ba-hovering-on-target
-  "I am starting to follow the target"
-  (fn [{:keys [timer-start]}] (nil? timer-start))
-  (fn [navdata]
-    (swap! nav-data merge {:timer-start (.getTime (new java.util.Date))})))
-
-(def-belief-action ba-following-target
-  "I have been following the target for under 1 minutes"
-  (fn [{:keys [timer-start]}]
-    (when timer-start
-      (let [time-elapsed  (- (.getTime (new java.util.Date)) timer-start)]
-        (swap! nav-data merge {:timer-elapsed  time-elapsed})
-        (< time-elapsed 20000))))
-  nil)
-
-(def-goal g-follow-target
-  "I want to follow the target for 1 minutes"
-  (fn [{:keys [timer-elapsed]}]
-    (when timer-elapsed
-      (> timer-elapsed 20000)))
-  [ba-hovering-on-target ba-following-target])
-
-
-;;;; define the goal list
-
-(set-current-goal-list [g-take-off g-cruising-altitude g-detect-target
-                        g-follow-target g-land])
+(set-current-goal-list [g-take-off g-cruising-altitude g-land])
 
 
 ;;;  initialization to run
 
 (drone-initialize)
-(drone :target-roundel-v)
-;; the drone will look for the black and white roundel on the vertical camera
 (drone-init-navdata)
 (end-navstream)  ;;If running in the repl end the nav-stream when done
-
-
-;;(drone-do-for 2  :tilt-front 0.2)
-
-(drone :land)
-@nav-data
-@current-belief
-@current-goal-list
-(:timer-start @nav-data)
-(pst (first (agent-errors nav-agent)) )
-ba-no-detect-vertical-target
-((:belief ba-no-detect-vertical-target) @nav-data)
-(agent-errors nav-agent)
-
-(restart-agent nav-agent {})
-(swap! nav-data {})
-(:timer-elapsed @nav-data)
-
-
-
-
-
 
 

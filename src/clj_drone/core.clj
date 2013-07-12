@@ -16,6 +16,7 @@
 (def nav-agent (agent {}))
 (def socket-timeout (atom 9000))
 (declare drone)
+(declare drone-init-navdata)
 
 
 (defn init-logger []
@@ -93,15 +94,28 @@
       (.setSoTimeout navdata-socket @socket-timeout)
       (send-navdata navdata-socket nav-datagram-send-packet))))
 
+(defn navdata-error-handler [ag ex]
+  (do
+    (println "evil error occured: " ex " and we still have value " @ag)
+    (when (= (.getClass ex) java.net.SocketTimeoutException)
+      (println "Reststarting nav stream")
+      (def navdata-socket (DatagramSocket. ))
+      (println "redef navdata-socket")
+      (.setSoTimeout navdata-socket @socket-timeout)
+      (println "reset socket timout")
+      (def nav-agent (agent {}))
+      (println (str "agent now is " nav-agent))
+      (when-not  @stop-navstream
+        (drone-init-navdata)))))
 
 (defn drone-init-navdata []
   (do
     (init-logger)
     (log/info "Initializing navdata")
     (reset! nav-data {})
+    (set-error-handler! nav-agent navdata-error-handler)
     (init-streaming-navdata navdata-socket drone-host navdata-port)
     (drone :init-navdata)
     (drone :control-ack)
     (init-streaming-navdata navdata-socket drone-host navdata-port)
-    (start-streaming-navdata navdata-socket drone-host navdata-port)))
-
+    (start-streaming-navdata navdata-socket drone-host navdata-port) ))
