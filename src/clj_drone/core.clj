@@ -53,7 +53,7 @@
   (when (> seconds 0)
     (drone command-key w x y z)
     (Thread/sleep 30)
-    (drone-do-for (- seconds 0.03) command-key w x y z)))
+    (recur (- seconds 0.03) command-key [w x y z])))
 
 (defn drone-stop-navdata []
   (reset! stop-navstream true))
