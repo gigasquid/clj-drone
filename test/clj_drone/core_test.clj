@@ -6,30 +6,29 @@
 
 (deftest core-tests
   (facts "default initialize gets default host and port"
-        (drone-initialize) => nil
-        (.getHostName drone-host) => default-drone-ip
-        at-port => default-at-port
-        navdata-port => default-navdata-port
-        @counter => 1
+        (.getHostName (:host (:default @drones))) => default-drone-ip
+        (:at-port (:default @drones)) => default-at-port
+        (:navdata-port (:default @drones)) => default-navdata-port
+        @(:counter (:default @drones)) => 1
         (against-background (before :facts (drone-initialize))))
 
-  (fact "custom initiliaze uses custom host and port"
-        (.getHostName drone-host) => "192.168.2.2"
-        at-port => 4444
-        navdata-port => 3333
-        @counter => 1
-        (against-background (before :facts (drone-initialize "192.168.2.2" 4444 3333))))
+  (fact "custom initiliaze uses custom name host and port"
+        (.getHostName (:host (:frank @drones))) => "192.168.2.2"
+        (:at-port (:frank @drones)) => 4444
+        (:navdata-port (:frank @drones)) => 3333
+        @(:counter (:frank @drones)) => 1
+        (against-background (before :facts (drone-initialize :frank "192.168.2.2" 4444 3333))))
 
   (fact "drone command passes along the data to send-command"
         (drone :take-off) => anything
         (provided
-         (send-command "AT*REF=2,290718208\r") => 1)
+         (send-command :default "AT*REF=2,290718208\r") => 1)
         (against-background (before :facts (drone-initialize))))
 
   (fact "drone-do-for command calls drone command every 30 sec"
         (drone-do-for 1 :take-off) => anything
         (provided
-         (drone :take-off nil nil nil nil) => 1 :times #(< 0 %1))
+         (mdrone :default :take-off nil nil nil nil) => 1 :times #(< 0 %1))
         (against-background (before :facts (drone-initialize)))))
 
 

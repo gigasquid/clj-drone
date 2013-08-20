@@ -296,8 +296,8 @@ frames for display. Here is a sample:
 
 ````clojure
 (drone-initialize)
-(init-video (drone-ip drone-host))
-(start-video (drone-ip drone-host))
+(init-video (drone-ip :default))
+(start-video (drone-ip :default))
 (end-video)
 ```
 
@@ -308,8 +308,8 @@ Example:
 ````clojure
 (drone-initialize)
 (configure-save-video true)
-(init-video (drone-ip drone-host))
-(start-video (drone-ip drone-host))
+(init-video (drone-ip :default))
+(start-video (drone-ip :default))
 (end-video)
 ```
 

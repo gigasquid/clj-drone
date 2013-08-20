@@ -9,6 +9,6 @@
 ;You can use ffmpeg -f h264 -an -i vid.h264 home.m4v to convert it
 (drone-initialize)
 (configure-save-video true)
-(init-video (drone-ip drone-host))
-(start-video (drone-ip drone-host))
+(init-video (drone-ip :default))
+(start-video (drone-ip :default))
 (end-video)

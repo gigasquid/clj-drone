@@ -5,6 +5,6 @@
 ;This video input from the drone is h264.  It is converted to png and
 ;displayed to the viewer
 (drone-initialize)
-(init-video (drone-ip drone-host))
-(start-video (drone-ip drone-host))
+(init-video (drone-ip :default))
+(start-video (drone-ip :default))
 (end-video)
