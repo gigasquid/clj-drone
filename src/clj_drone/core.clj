@@ -121,8 +121,7 @@
 (defn drone-init-navdata []
   (let [host (:host (:default @drones))
         navdata-port (:navdata-port (:default @drones))
-        navdata-socket (:navdata-socket (:default @drones))
-        ]
+        navdata-socket (:navdata-socket (:default @drones))]
     (do
       (init-logger)
       (log/info "Initializing navdata")
