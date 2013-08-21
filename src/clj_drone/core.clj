@@ -36,7 +36,7 @@
      (mdrone name :flat-trim)))
 
 (defn drone-ip [drone-name]
-   (.getHostName (:host (:drone-name @drones))))
+   (.getHostName (:host (drone-name @drones))))
 
 (defn send-command [name data]
   (let [host (:host (name @drones))

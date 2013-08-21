@@ -194,13 +194,19 @@
 
 ;; ( convert-buffer-image-to-mat my-img :color)
 ;; (double (/ 1000 15))
-;; (drone-initialize)
+;(drone-initialize)
+;(init-video (drone-ip :default))
+;(start-video (drone-ip :default))
+
 ;; (drone :video-frame-rate-15)
-;;  (init-opencv)
-;; (init-decoder)
-;; (setup-viewer)
-;; (init-video-stream "192.168.1.1")
-;; (start-video "192.168.1.1")
+;(init-opencv)
+;(init-decoder)
+;(setup-viewer)
+; (init-video-stream "192.168.1.1")
+;(start-video "192.168.1.1")
+
+
+
 ;; (time (read-frame "192.168.1.1" nil))
 ;; (double (/ 1000 15))
 
@@ -209,7 +215,8 @@
 ;; (.drawImage (.getGraphics view1) my-img 10 10 view1)
 ;; (update-image)
 ;; ;; (time (read-frame "192.168.1.1" nil))
-; (agent-errors display-agent)
+ ;(agent-errors video-agent)
+
 ;; (restart-agent display-agent1  0)
 ;(end-video)
 
