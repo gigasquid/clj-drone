@@ -321,6 +321,25 @@ Converting video can be done with the following command.
    ffmpeg -f h264 -an -i vid.h264 stream.m4v
 
 
+## OpenCV Face Recognition
+Once the video is in png format, it can be sent to OpenCV for
+more processing.  There is an example of facial recogintion in the
+examples directory.  OpenCV requires native java bindings to run.
+The native library for MacOS  and opencv jar can be found in the opencv
+directory. If you have a different OS, you will need to download
+OpenCV and copy the native lib there.
+
+Example:
+````clojure
+(configure-opencv true)
+(drone-initialize)
+(init-opencv)
+(init-video (drone-ip :default))
+(start-video (drone-ip :default))
+(end-video)
+````
+
+
 ## Running locally
 You need to install the h264 (for video conversion) jar locally.  You can use the
 [lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
