@@ -347,9 +347,9 @@ adhoc network.
 ### Change first drone to adhoc network
 Connect your computer to the first drones network.
 
-```
+```clojure
 telnet 192.68.1.1
-``
+```
 
 Create the following file as adhoc.sh.  This shell script will
 temporarily change the network to an adhoc network named
