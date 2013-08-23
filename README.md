@@ -356,11 +356,11 @@ temporarily change the network to an adhoc network named
 "multidrone_ah" and assign it a static ip of 192.168.1.100.
 The next time you reboot your drone, things will be back to normal.
 
-````
-# This script should be run on the drone.
-# Change the IP address to be difference
-# for each drone on the same ad-hoc network
-#
+```clojure
+; This script should be run on the drone.
+; Change the IP address to be difference
+; for each drone on the same ad-hoc network
+;
 killall udhcpd
 ifconfig ath0 down
 iwconfig ath0 mode ad-hoc essid multidrone_ah channel auto commit
@@ -371,11 +371,11 @@ Run the script.
 
 ### Change the second drone to the adhoc network
 
-````
-# This script should be run on the drone.
-# Change the IP address to be difference
-# for each drone on the same ad-hoc network
-#
+````clojure
+; This script should be run on the drone.
+; Change the IP address to be difference
+; for each drone on the same ad-hoc network
+;
 killall udhcpd
 ifconfig ath0 down
 iwconfig ath0 mode ad-hoc essid multidrone_ah channel auto commit
