@@ -345,7 +345,7 @@ To control multiple drones, you need to first get them all on the same
 adhoc network.
 
 ### Change first drone to adhoc network
-Connect your computer to the first drones network.
+Connect your computer to the first drone's network.
 
 ```clojure
 telnet 192.68.1.1
@@ -370,6 +370,12 @@ ifconfig ath0 192.168.1.100 netmask 255.255.255.0 up
 Run the script.
 
 ### Change the second drone to the adhoc network
+
+Connect your computer to the second drone's network.
+
+```clojure
+telnet 192.68.1.1
+```
 
 ````clojure
 ; This script should be run on the drone.
