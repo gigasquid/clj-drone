@@ -340,6 +340,75 @@ Example:
 ````
 
 
+## Controlling Multiple Drones
+To control multiple drones, you need to first get them all on the same
+adhoc network.
+
+### Change first drone to adhoc network
+Connect your computer to the first drones network.
+
+```
+telnet 192.68.1.1
+``
+
+Create the following file as adhoc.sh.  This shell script will
+temporarily change the network to an adhoc network named
+"multidrone_ah" and assign it a static ip of 192.168.1.100.
+The next time you reboot your drone, things will be back to normal.
+
+````
+# This script should be run on the drone.
+# Change the IP address to be difference
+# for each drone on the same ad-hoc network
+#
+killall udhcpd
+ifconfig ath0 down
+iwconfig ath0 mode ad-hoc essid multidrone_ah channel auto commit
+ifconfig ath0 192.168.1.100 netmask 255.255.255.0 up
+````
+
+Run the script.
+
+### Change the second drone to the adhoc network
+
+````
+# This script should be run on the drone.
+# Change the IP address to be difference
+# for each drone on the same ad-hoc network
+#
+killall udhcpd
+ifconfig ath0 down
+iwconfig ath0 mode ad-hoc essid multidrone_ah channel auto commit
+ifconfig ath0 192.168.1.200 netmask 255.255.255.0 up
+````
+
+Run the script.
+
+### On your laptop
+
+- Connect to the adhoc network that the drones are on "multidrone_ah"
+- Change your computer to a static ip on the network (from network
+  preferences on mac) something like 192.168.1.101
+
+Now you are ready to run the program. There is an example
+multi-drone.clj in the examples directory.
+
+Example:
+
+```clojure
+(drone-initialize :drone1 "192.168.1.100" default-at-port default-navdata-port)
+(mdrone :drone2 :take-off)
+(mdrone :drone2 :land)
+
+(drone-initialize :drone2 "192.168.1.200" default-at-port default-navdata-port)
+(mdrone :drone1 :take-off)
+(mdrone :drone1 :land)
+````
+
+Currently only sending commands is supported with multidrone.
+Navigation data is next on the list.
+
+
 ## Running locally
 You need to install the h264 (for video conversion) jar locally.  You can use the
 [lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
