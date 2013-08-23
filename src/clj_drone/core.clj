@@ -58,7 +58,7 @@
   (when (> seconds 0)
     (mdrone name command-key w x y z)
     (Thread/sleep 30)
-    (recur (- seconds 0.03) command-key [w x y z])))
+    (recur name (- seconds 0.03) command-key [w x y z])))
 
 (defn drone-do-for [seconds command-key & [w x y z]]
   (mdrone-do-for :default seconds command-key w x y z))
