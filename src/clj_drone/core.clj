@@ -12,7 +12,6 @@
 (def default-navdata-port 5554)
 (def drones (atom {}))
 
-(def nav-agent (agent {}))
 (def socket-timeout (atom 9000))
 (declare mdrone)
 (declare drone-init-navdata)
@@ -32,7 +31,8 @@
                                :navdata-port navdata-port
                                :counter (atom 0)
                                :at-socket (DatagramSocket. )
-                               :navdata-socket (DatagramSocket. )})
+                               :navdata-socket (DatagramSocket. )
+                               :nav-agent (agent {})})
      (mdrone name :flat-trim)))
 
 (defn drone-ip [drone-name]
@@ -83,7 +83,7 @@
       (log/info "navstream-ended")
       (recur nil socket packet))))
 
-(defn start-streaming-navdata [navdata-socket host port]
+(defn start-streaming-navdata [navdata-socket host port nav-agent]
   (let [receive-data (byte-array 2048)
         nav-datagram-receive-packet (new-datagram-packet receive-data host port)]
     (do
@@ -102,8 +102,6 @@
       (.setSoTimeout navdata-socket @socket-timeout)
       (send-navdata navdata-socket nav-datagram-send-packet))))
 
-
-
 (defn navdata-error-handler [ag ex]
   (do
     (println "evil error occured: " ex " and we still have value " @ag)
@@ -114,21 +112,24 @@
       (.setSoTimeout (:navdata-socket (:default @drones)) @socket-timeout)
       (println "reset socket timout")
       (def nav-agent (agent {}))
-      (println (str "agent now is " nav-agent))
+      (swap! drones assoc :default (assoc (:default @drones) :nav-agent (agent {})))
+      (println (str "agent now is " (:nav-agent (:default @drones))))
       (when-not  @stop-navstream
         (drone-init-navdata)))))
 
 (defn drone-init-navdata []
   (let [host (:host (:default @drones))
         navdata-port (:navdata-port (:default @drones))
-        navdata-socket (:navdata-socket (:default @drones))]
+        navdata-socket (:navdata-socket (:default @drones))
+        nav-agent (:nav-agent (:default @drones))]
     (do
       (init-logger)
       (log/info "Initializing navdata")
+      (log/info nav-agent)
       (reset! nav-data {})
       (set-error-handler! nav-agent navdata-error-handler)
       (init-streaming-navdata navdata-socket host navdata-port)
       (drone :init-navdata)
       (drone :control-ack)
       (init-streaming-navdata navdata-socket host navdata-port)
-      (start-streaming-navdata navdata-socket host navdata-port) )))
+      (start-streaming-navdata navdata-socket host navdata-port nav-agent))))

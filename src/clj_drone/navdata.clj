@@ -84,8 +84,6 @@
 (defn tag-type-mask [type-num]
   (bit-shift-left 1 (- type-num 1)))
 
-(tag-type-mask 6)
-
 (def option-tags [0 :NAVDATA-DEMO-TAG])
 
 (defn new-datagram-packet [data host port]
