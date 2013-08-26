@@ -1,5 +1,6 @@
 (ns clj-drone.core
-  (:import (java.net DatagramPacket DatagramSocket InetAddress))
+  (:import (java.net DatagramPacket DatagramSocket InetAddress)
+           (org.apache.log4j PatternLayout))
   (:require  [clj-logging-config.log4j :as log-config]
              [clojure.stacktrace :refer :all]
              [clojure.tools.logging :as log]
@@ -19,6 +20,7 @@
 
 (defn init-logger []
   (log-config/set-logger! :level :debug
+                          :layout (PatternLayout. "%d %p %m%n")
                           :out "logs/drone.log"))
 (init-logger)
 
