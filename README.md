@@ -343,6 +343,7 @@ Example:
 ## Controlling Multiple Drones
 To control multiple drones, you need to first get them all on the same
 adhoc network.
+(Thanks to Jim Weirich for helping create the script and get this going.)
 
 ### Change first drone to adhoc network
 Connect your computer to the first drone's network.
