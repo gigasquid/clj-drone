@@ -3,7 +3,6 @@
   (:import (java.lang Float)))
 
 
-(def nav-data (atom {}))
 (def stop-navstream (atom false))
 (def log-data (atom [:seq-num :pstate :com-watchdog :communication
                      :control-state :roll :pitch :yaw :altitude]))
@@ -200,7 +199,7 @@
       new-options
       (parse-options ba next-offset new-options))))
 
-(defn parse-navdata [navdata-bytes]
+(defn parse-navdata [navdata-bytes navdata]
   (let [ header (get-int navdata-bytes 0)
         state (get-int navdata-bytes 4)
         seqnum (get-int navdata-bytes 8)
@@ -209,7 +208,7 @@
         options (parse-options navdata-bytes 16 {})
         new-data (merge {:header header :seq-num seqnum :vision-flag vision-flag}
                         pstate options)]
-    (swap! nav-data merge new-data)))
+    (swap! navdata merge new-data)))
 
 (defn send-navdata  [navdata-socket datagram-packet]
   (.send navdata-socket datagram-packet))
@@ -220,6 +219,6 @@
 (defn get-navdata-bytes  [datagram-packet]
   (.getData datagram-packet))
 
-(defn log-flight-data []
-  (select-keys @nav-data @log-data))
+(defn log-flight-data [navdata]
+  (select-keys @navdata @log-data))
 

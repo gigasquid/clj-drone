@@ -114,31 +114,35 @@
         option => (contains {:detect-camera-type :roundel-under-drone })
         ))
 
+
 (fact "about parse-navdata"
-      (parse-navdata nav-input) => anything
-      @nav-data => (contains {:header 0x55667788})
-      @nav-data => (contains {:battery :ok})
-      @nav-data => (contains {:flying :landed})
-      @nav-data => (contains {:seq-num 870})
-      @nav-data => (contains {:vision-flag false})
-      @nav-data => (contains {:control-state :landed})
-      @nav-data => (contains {:battery-percent 100 })
-      @nav-data => (contains {:pitch (float -1.075) })
-      @nav-data => (contains {:roll (float -2.904) })
-      @nav-data => (contains {:yaw (float -0.215) })
-      @nav-data => (contains {:altitude (float 0.0) })
-      @nav-data => (contains {:velocity-x (float 0.0)})
-      @nav-data => (contains {:velocity-y (float 0.0)})
-      @nav-data => (contains {:velocity-z (float 0.0)})
-      (against-background (before :facts (reset! nav-data {}))))
+      (parse-navdata nav-input (get-nav-data :default)) => anything
+      @(get-nav-data :default) => (contains {:header 0x55667788})
+      @(get-nav-data :default) => (contains {:battery :ok})
+      @(get-nav-data :default) => (contains {:flying :landed})
+      @(get-nav-data :default) => (contains {:seq-num 870})
+      @(get-nav-data :default) => (contains {:vision-flag false})
+      @(get-nav-data :default) => (contains {:control-state :landed})
+      @(get-nav-data :default) => (contains {:battery-percent 100 })
+      @(get-nav-data :default) => (contains {:pitch (float -1.075) })
+      @(get-nav-data :default) => (contains {:roll (float -2.904) })
+      @(get-nav-data :default) => (contains {:yaw (float -0.215) })
+      @(get-nav-data :default) => (contains {:altitude (float 0.0) })
+      @(get-nav-data :default) => (contains {:velocity-x (float 0.0)})
+      @(get-nav-data :default) => (contains {:velocity-y (float 0.0)})
+      @(get-nav-data :default) => (contains {:velocity-z (float 0.0)})
+      (against-background (before :facts (reset! drones {:default {:nav-data (atom {})}}))))
 
 
 (fact "about stream-navdata"
-      (stream-navdata nil socket packet) => anything
+      (stream-navdata nil socket packet :default) => anything
       (provided
-       (receive-navdata anything anything) => 1
-       (get-navdata-bytes anything) => nav-input)
-      (against-background (before :facts (reset! stop-navstream true))))
+        (receive-navdata anything anything) => 1
+        (get-nav-data :default) => (:nav-data (:default @drones))
+        (get-navdata-bytes anything) => nav-input)
+      (against-background (before :facts (do
+                                           (reset! drones {:default {:nav-data (atom {})}})
+                                           (reset! stop-navstream true)))))
 
 
 (fact "about parse-nav-state"
