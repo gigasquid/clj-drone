@@ -135,14 +135,16 @@
 
 
 (fact "about stream-navdata"
-      (stream-navdata nil socket packet :default) => anything
+      (stream-navdata nil socket packet) => anything
       (provided
         (receive-navdata anything anything) => 1
         (get-nav-data :default) => (:nav-data (:default @drones))
         (get-navdata-bytes anything) => nav-input)
-      (against-background (before :facts (do
-                                           (reset! drones {:default {:nav-data (atom {})}})
-                                           (reset! stop-navstream true)))))
+      (against-background
+        (before :facts (do
+                         (reset! drones {:default {:nav-data (atom {})
+                                                   :host (InetAddress/getByName "192.168.1.1")}})
+                         (reset! stop-navstream true)))))
 
 
 (fact "about parse-nav-state"

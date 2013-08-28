@@ -9,10 +9,12 @@
 
 (def default-drone-ip "192.168.1.1")
 (def default-at-port 5556)
-(def default-navdata-port 5554)
+(def navdata-port 5554)
+(def navdata-socket (DatagramSocket. ))
+(def nav-agent (agent {}))
 (def drones (atom {}))
 
-(def socket-timeout (atom 9000))
+(def socket-timeout (atom 10000))
 (declare mdrone)
 (declare drone-init-navdata)
 
@@ -23,15 +25,12 @@
 (init-logger)
 
 (defn drone-initialize
-  ([] (drone-initialize :default default-drone-ip default-at-port default-navdata-port))
-  ([name ip at-port navdata-port]
+  ([] (drone-initialize :default default-drone-ip default-at-port))
+  ([name ip at-port]
      (swap! drones assoc name {:host (InetAddress/getByName ip)
                                :at-port at-port
-                               :navdata-port navdata-port
                                :counter (atom 0)
                                :at-socket (DatagramSocket. )
-                               :navdata-socket (DatagramSocket. )
-                               :nav-agent (agent {})
                                :nav-data (atom {})})
      (mdrone name :flat-trim)))
 
@@ -63,6 +62,9 @@
 (defn drone-do-for [seconds command-key & [w x y z]]
   (mdrone-do-for :default seconds command-key w x y z))
 
+(defn find-drone [ip]
+  (select-keys @drones (for [[k v] @drones :when (= ip (.getHostAddress (:host v)))] k)))
+
 (defn drone-stop-navdata []
   (reset! stop-navstream true))
 
@@ -74,17 +76,21 @@
     (log/info "Watchdog Reset")
     (drone :reset-watchdog)))
 
-(defn stream-navdata [_ socket packet name]
+(defn stream-navdata [_ socket packet]
   (do
     (receive-navdata socket packet)
-    (parse-navdata (get-navdata-bytes packet) (get-nav-data name))
-    (log/info (str "navdata: "(log-flight-data (get-nav-data name))))
-    (communication-check name)
-    (eval-current-goals @(get-nav-data name))
-    (log/info (log-goal-info))
+    (println (str "data from" (.getHostAddress (.getAddress packet)) ))
+    (let [ipfrom (.getHostAddress (.getAddress packet))
+          drone (find-drone ipfrom)
+          from-name (first (keys drone))]
+      (parse-navdata (get-navdata-bytes packet) (get-nav-data from-name))
+      (log/info (str "(" from-name ") " "navdata: "(log-flight-data (get-nav-data from-name))))
+      (communication-check from-name)
+      (eval-current-goals @(get-nav-data from-name))
+      (log/info (log-goal-info)))
     (if @stop-navstream
       (log/info "navstream-ended")
-      (recur nil socket packet name))))
+      (recur nil socket packet))))
 
 (defn start-streaming-navdata [name navdata-socket host port nav-agent]
   (let [receive-data (byte-array 2048)
@@ -93,7 +99,7 @@
       (log/info "Starting navdata stream")
       (swap! (get-nav-data name) {})
       (.setSoTimeout navdata-socket @socket-timeout)
-      (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet name)
+      (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
 
@@ -113,21 +119,17 @@
       (println "evil error occured: " ex " and we still have value " @ag)
       (when (= (.getClass ex) java.net.SocketTimeoutException)
         (println "Reststarting nav stream")
-        (swap! drones assoc name (assoc (name @drones) :navdata-socket (DatagramSocket. )))
+        (def navdata-socket (DatagramSocket. ))
         (println "redef navdata-socket")
-        (.setSoTimeout (:navdata-socket (name @drones)) @socket-timeout)
+        (.setSoTimeout navdata-socket @socket-timeout)
         (println "reset socket timout")
         (def nav-agent (agent {}))
-        (swap! drones assoc name (assoc (name @drones) :nav-agent (agent {})))
-        (println (str "agent now is " (:nav-agent (name @drones))))
+        (println (str "agent now is " nav-agent))
         (when-not  @stop-navstream
           (mdrone-init-navdata name))))))
 
 (defn mdrone-init-navdata [name]
   (let [host (:host (name @drones))
-        navdata-port (:navdata-port (name @drones))
-        navdata-socket (:navdata-socket (name @drones))
-        nav-agent (:nav-agent (name @drones))
         nav-data (:nav-data (name @drones))]
     (do
       (init-logger)
@@ -139,9 +141,14 @@
       (drone :init-navdata)
       (drone :control-ack)
       (init-streaming-navdata navdata-socket host navdata-port)
-      (start-streaming-navdata name navdata-socket host navdata-port nav-agent))))
+      )))
+
+(defn start-stream [name]
+  (let [host (:host (name @drones))]
+    (start-streaming-navdata name navdata-socket host navdata-port nav-agent)))
 
 (defn drone-init-navdata []
-  (mdrone-init-navdata :default))
+  (mdrone-init-navdata :default)
+  (start-stream :default))
 
 
