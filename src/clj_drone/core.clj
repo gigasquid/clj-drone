@@ -105,7 +105,7 @@
     (do
       (log/info "Starting navdata stream")
       (swap! (get-nav-data name) {})
-      (.setSoTimeout navdata-socket @socket-timeout)
+      ;(.setSoTimeout navdata-socket @socket-timeout)
       (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
@@ -115,7 +115,6 @@
         nav-datagram-send-packet (new-datagram-packet send-data host port)]
     (do
       (reset-navstream)
-      (.setSoTimeout navdata-socket @socket-timeout)
       (send-navdata navdata-socket nav-datagram-send-packet))))
 
 (declare mdrone-init-navdata)
@@ -128,7 +127,7 @@
         (println "Reststarting nav stream")
         (def navdata-socket (DatagramSocket. ))
         (println "redef navdata-socket")
-        (.setSoTimeout navdata-socket @socket-timeout)
+        ;(.setSoTimeout navdata-socket @socket-timeout)
         (println "reset socket timout")
         (def nav-agent (agent {}))
         (println (str "agent now is " nav-agent))
