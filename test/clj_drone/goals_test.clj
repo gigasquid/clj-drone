@@ -1,6 +1,7 @@
 (ns clj-drone.goals-test
   (:require [clojure.test :refer :all]
             [midje.sweet :refer :all]
+            [clj-drone.core :refer :all]
             [clj-drone.goals :refer :all]))
 
 (defn belief-fn1 [navdata] (= 1 1))
@@ -16,9 +17,11 @@
 (def-goal g3 "goal 3" goal-fn2 [ba1 ba2])
 
 (defn reset-beliefs-goals []
-  (reset! current-belief "None")
-  (reset! current-goal "None")
-  (reset! current-goal-list []))
+  (reset! drones {:default { :current-belief (atom "None")
+                            :current-goal (atom "None")
+                            :current-goal-list (atom [])}}))
+
+(reset-beliefs-goals)
 
 (fact "about def-belief-action"
       (let [ belief-str "I am on the ground"
@@ -39,55 +42,55 @@
         (first (be-happy :belief-actions)) => smile))
 
 (fact "eval-belief-action will execute the action if the belief-fn is true"
-      (eval-belief-action ba1 {}) => "My first action fn"
-      @current-belief => "belief 1")
+      (eval-belief-action ba1 {} drones :default) => "My first action fn"
+      (get-current-belief drones :default) => "belief 1")
 
 (fact "eval-belief-action can handle a nill action"
-      (eval-belief-action ba3 {}) => nil)
+      (eval-belief-action ba3 {} drones :default) => nil)
 
 (fact "eval-belief-action will not execute action if the belief-fn is false"
-      (eval-belief-action ba2 {}) => nil
-      @current-belief => "None"
+      (eval-belief-action ba2 {} drones :default) => nil
+      (get-current-belief drones :default) => "None"
       (against-background (before :facts (reset-beliefs-goals))))
 
 (fact "about eval-goal when the goal has been reached"
-      (eval-goal g1 {}) => :goal-reached
-      @current-belief => "Achieved goal: goal 1"
-      @current-goal => "goal 1"
+      (eval-goal g1 {} drones :default) => :goal-reached
+      (get-current-belief drones :default) => "Achieved goal: goal 1"
+      (get-current-goal drones :default) => "goal 1"
       (against-background (before :facts (reset-beliefs-goals))))
 
 (fact "about eval-goal when the goal has not been reached"
-      (eval-goal g2 {}) => nil
-      @current-belief => "belief 1"
-      @current-goal => "goal 2"
+      (eval-goal g2 {} drones :default) => nil
+      (get-current-belief drones :default) => "belief 1"
+      (get-current-goal drones :default) => "goal 2"
       (against-background (before :facts (reset-beliefs-goals))))
 
 (fact "eval-goal handles a nil goal"
-      (eval-goal nil {}) => nil)
+      (eval-goal nil {} drones :default) => nil)
 
 (fact "eval-goal-list returns the same goal list if first goal has not been reached"
-      (eval-goal-list [g2 g3] {}) => [g2 g3]
-      @current-belief => "belief 1"
-      @current-goal => "goal 2"
+      (eval-goal-list [g2 g3] {} drones :default) => [g2 g3]
+      (get-current-belief drones :default) => "belief 1"
+      (get-current-goal drones :default) => "goal 2"
       (against-background (before :facts (reset-beliefs-goals))))
 
 (fact "eval-goal-list returns the rest of the goal list if first goal has been reached"
-      (eval-goal-list [g1 g2 g3] {}) => [g2 g3]
-      @current-belief => "Achieved goal: goal 1"
-      @current-goal => "goal 1"
+      (eval-goal-list [g1 g2 g3] {} drones :default) => [g2 g3]
+      (get-current-belief drones :default) => "Achieved goal: goal 1"
+      (get-current-goal drones :default) => "goal 1"
       (against-background (before :facts (reset-beliefs-goals))))
 
 (fact "eval-goal-list handles nil and  an empty list"
-      (eval-goal-list nil {}) => nil
-      (eval-goal-list [] {}) => [])
+      (eval-goal-list nil {} drones :default) => nil
+      (eval-goal-list [] {} drones :default) => [])
 
 (fact "about set-current-goal-list"
-      (set-current-goal-list [1 2 3]) => anything
-      @current-goal-list => [1 2 3])
+      (set-current-goal-list drones :default [1 2 3]) => anything
+      (get-current-goal-list drones :default) => [1 2 3])
 
 (fact "about log-goal-list"
       (log-goal-list [g1 g2 g3]) => "goal 1, goal 2, goal 3")
 
 (fact "about log-goal-info"
-      (log-goal-info) => "goal list:  current-goal: None current-belief: None"
+      (log-goal-info drones :default) => "goal list:  current-goal: None current-belief: None"
       (against-background (before :facts (reset-beliefs-goals))))

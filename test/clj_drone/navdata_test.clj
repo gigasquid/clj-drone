@@ -139,11 +139,15 @@
       (provided
         (receive-navdata anything anything) => 1
         (get-nav-data :default) => (:nav-data (:default @drones))
-        (get-navdata-bytes anything) => nav-input)
+        (get-navdata-bytes anything) => nav-input
+        (get-ip-from-packet anything) => "192.168.1.1")
       (against-background
         (before :facts (do
                          (reset! drones {:default {:nav-data (atom {})
-                                                   :host (InetAddress/getByName "192.168.1.1")}})
+                                                   :host (InetAddress/getByName "192.168.1.1")
+                                                   :current-belief (atom "None")
+                                                   :current-goal (atom "None")
+                                                   :current-goal-list (atom [])}})
                          (reset! stop-navstream true)))))
 
 

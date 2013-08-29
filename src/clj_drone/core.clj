@@ -31,7 +31,10 @@
                                :at-port at-port
                                :counter (atom 0)
                                :at-socket (DatagramSocket. )
-                               :nav-data (atom {})})
+                               :nav-data (atom {})
+                               :current-goal-list (atom [])
+                               :current-goal (atom "None")
+                               :current-belief (atom [])})
      (mdrone name :flat-trim)))
 
 (defn drone-ip [drone-name]
@@ -76,21 +79,25 @@
     (log/info "Watchdog Reset")
     (drone :reset-watchdog)))
 
+(defn get-ip-from-packet [packet]
+  (.getHostAddress (.getAddress packet)))
+
 (defn stream-navdata [_ socket packet]
   (do
     (receive-navdata socket packet)
-    (println (str "data from" (.getHostAddress (.getAddress packet)) ))
-    (let [ipfrom (.getHostAddress (.getAddress packet))
+    ;(println (str "data from" (.getHostAddress (.getAddress packet)) ))
+    (let [ipfrom (get-ip-from-packet packet)
           drone (find-drone ipfrom)
           from-name (first (keys drone))]
       (parse-navdata (get-navdata-bytes packet) (get-nav-data from-name))
       (log/info (str "(" from-name ") " "navdata: "(log-flight-data (get-nav-data from-name))))
       (communication-check from-name)
-      (eval-current-goals @(get-nav-data from-name))
-      (log/info (log-goal-info)))
+      (eval-current-goals drones from-name @(get-nav-data from-name))
+      (log/info (log-goal-info drones from-name)))
     (if @stop-navstream
       (log/info "navstream-ended")
       (recur nil socket packet))))
+
 
 (defn start-streaming-navdata [name navdata-socket host port nav-agent]
   (let [receive-data (byte-array 2048)
