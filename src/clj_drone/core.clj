@@ -14,7 +14,7 @@
 (def nav-agent (agent {}))
 (def drones (atom {}))
 
-(def socket-timeout (atom 10000))
+(def socket-timeout (atom 60000))
 (declare mdrone)
 (declare drone-init-navdata)
 
@@ -105,7 +105,7 @@
     (do
       (log/info "Starting navdata stream")
       (swap! (get-nav-data name) {})
-      ;(.setSoTimeout navdata-socket @socket-timeout)
+      (.setSoTimeout navdata-socket @socket-timeout)
       (send nav-agent stream-navdata navdata-socket nav-datagram-receive-packet)
       (log/info "Creating navdata stream" ))))
 
@@ -127,7 +127,7 @@
         (println "Reststarting nav stream")
         (def navdata-socket (DatagramSocket. ))
         (println "redef navdata-socket")
-        ;(.setSoTimeout navdata-socket @socket-timeout)
+        (.setSoTimeout navdata-socket @socket-timeout)
         (println "reset socket timout")
         (def nav-agent (agent {}))
         (println (str "agent now is " nav-agent))
@@ -146,8 +146,7 @@
       (init-streaming-navdata navdata-socket host navdata-port)
       (drone :init-navdata)
       (drone :control-ack)
-      (init-streaming-navdata navdata-socket host navdata-port)
-      )))
+      (init-streaming-navdata navdata-socket host navdata-port))))
 
 (defn start-stream [name]
   (let [host (:host (name @drones))]
