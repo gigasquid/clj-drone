@@ -17,7 +17,7 @@
 (def-belief-action ba-taking-off
   "I am taking off"
   (fn [{:keys [control-state]}] (= control-state :trans-takeoff))
-  nil)
+  (fn [navdata] (drone :take-off)))
 
 (def-goal g-take-off
   "I want to fly."
@@ -57,12 +57,15 @@
 
 
 
-(set-current-goal-list [g-take-off g-cruising-altitude g-land])
+
 
 
 ;;;  initialization to run
 
 ;(drone-initialize)
+;(set-current-goal-list drones :default [g-take-off g-cruising-altitude g-land])
+
+
 ;(drone-init-navdata)
 ;(end-navstream)
 

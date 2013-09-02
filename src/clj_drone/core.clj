@@ -1,7 +1,8 @@
 (ns clj-drone.core
   (:import (java.net DatagramPacket DatagramSocket InetAddress))
-  (:require  [ clj-logging-config.log4j :as log-config]
-             [ clojure.tools.logging :as log]
+  (:require  [clj-logging-config.log4j :as log-config]
+             [clojure.stacktrace :refer :all]
+             [clojure.tools.logging :as log]
              [clj-drone.at :refer :all]
              [clj-drone.navdata :refer :all]
              [clj-drone.goals :refer :all]))
@@ -11,7 +12,6 @@
 (def default-at-port 5556)
 (def navdata-port 5554)
 (def navdata-socket (DatagramSocket. ))
-(def nav-agent (agent {}))
 (def drones (atom {}))
 
 (def socket-timeout (atom 60000))
@@ -31,6 +31,7 @@
                                :at-port at-port
                                :counter (atom 0)
                                :at-socket (DatagramSocket. )
+                               :nav-agent (agent {})
                                :nav-data (atom {})
                                :current-goal-list (atom [])
                                :current-goal (atom "None")
@@ -85,7 +86,6 @@
 (defn stream-navdata [_ socket packet]
   (do
     (receive-navdata socket packet)
-    ;(println (str "data from" (.getHostAddress (.getAddress packet)) ))
     (let [ipfrom (get-ip-from-packet packet)
           drone (find-drone ipfrom)
           from-name (first (keys drone))]
@@ -123,20 +123,22 @@
   (fn [ag ex]
     (do
       (println "evil error occured: " ex " and we still have value " @ag)
-      (when (= (.getClass ex) java.net.SocketTimeoutException)
-        (println "Reststarting nav stream")
-        (def navdata-socket (DatagramSocket. ))
-        (println "redef navdata-socket")
-        (.setSoTimeout navdata-socket @socket-timeout)
-        (println "reset socket timout")
-        (def nav-agent (agent {}))
-        (println (str "agent now is " nav-agent))
-        (when-not  @stop-navstream
-          (mdrone-init-navdata name))))))
+      (print-stack-trace ex)
+      ;; (when (= (.getClass ex) java.net.SocketTimeoutException)
+      ;;   (log/info "Reststarting nav stream")
+      ;;   (def navdata-socket (DatagramSocket. ))
+      ;;   (log/info "redef navdata-socket")
+      ;;   (.setSoTimeout navdata-socket @socket-timeout)
+      ;;   (def nav-agent (agent {}))
+      ;;   (log/info (str "agent now is " nav-agent))
+      ;;   (when-not  @stop-navstream
+      ;;     (mdrone-init-navdata name)))
+      )))
 
 (defn mdrone-init-navdata [name]
   (let [host (:host (name @drones))
-        nav-data (:nav-data (name @drones))]
+        nav-data (:nav-data (name @drones))
+        nav-agent (:nav-agent (name @drones))]
     (do
       (init-logger)
       (log/info "Initializing navdata")
@@ -144,12 +146,13 @@
       (reset! nav-data {})
       (set-error-handler! nav-agent (navdata-error-handler name))
       (init-streaming-navdata navdata-socket host navdata-port)
-      (drone :init-navdata)
-      (drone :control-ack)
+      (mdrone name :init-navdata)
+      (mdrone name :control-ack)
       (init-streaming-navdata navdata-socket host navdata-port))))
 
 (defn start-stream [name]
-  (let [host (:host (name @drones))]
+  (let [host (:host (name @drones))
+        nav-agent (:nav-agent (name @drones))]
     (start-streaming-navdata name navdata-socket host navdata-port nav-agent)))
 
 (defn drone-init-navdata []
