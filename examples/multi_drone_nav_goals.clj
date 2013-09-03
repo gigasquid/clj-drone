@@ -110,45 +110,71 @@
 
 
 
-;;;  initialization to run
+;; ;;;  initialization to run
 
-(drone-initialize :drone1  "192.168.1.1"  default-at-port)
-(set-current-goal-list drones :drone1 [g-take-off1 g-cruising-altitude1 g-land1])
-(mdrone-init-navdata :drone1)
-(start-stream :drone1)
-(mdrone :drone1 :emergency)
+;;  (drone-initialize :drone1  "192.168.1.1"  default-at-port)
+;; ;; (set-current-goal-list drones :drone1 [g-take-off1 g-cruising-altitude1 g-land1])
+;;  (mdrone-init-navdata :drone1)
+;;  (start-stream :drone1)
 
+;; ;; (mdrone :drone1 :land)
 
+ (end-navstream)
+(reset! drones {})
 
-;; (drone-initialize :drone1  "192.168.1.100"  default-at-port)
-;; (set-current-goal-list drones :drone1 [g-take-off1 g-cruising-altitude1 g-land1])
+;; (set-log-data [:seq-num :flying :battery-percent :con
+;;                :control-state :roll :pitch :yaw
+;;                :velocity-x :velocity-y :velocity-z :com-watchdog])
+;; @log-data
+;; (drone-initialize)
+
 ;; (drone-initialize :drone2  "192.168.1.200"  default-at-port)
-;; (set-current-goal-list drones :drone2 [g-take-off2 g-cruising-altitude2 g-land2])
-
-
-;; (mdrone-init-navdata :drone1)
-;; (start-stream :drone1)
-
 ;; (mdrone-init-navdata :drone2)
 ;; (start-stream :drone2)
 
+;; (drone-initialize :drone1  "192.168.1.100"  default-at-port)
+;; (mdrone-init-navdata :drone1)
+;; (start-stream :drone1)
 
-;;  @(:current-belief (:drone2  @drones))
-;; @(:current-goal (:drone2  @drones))
-;; @(:current-goal-list (:drone2  @drones))
+
+
+;;  -----------
+ (drone-initialize :drone1  "192.168.1.100"  default-at-port)
+(set-current-goal-list drones :drone1 [g-take-off1 g-cruising-altitude1 g-land1])
+
+(mdrone-init-navdata :drone1)
+(start-stream :drone1)
+
+
+
+(drone-initialize :drone2  "192.168.1.200"  default-at-port)
+(set-current-goal-list drones :drone2 [g-take-off2 g-cruising-altitude2 g-land2])
+
+(mdrone-init-navdata :drone2)
+(start-stream :drone2)
+
+;; ------------
+;; ;;  @(:current-belief (:drone1  @drones))
+;; ;;  @(:current-goal (:drone1  @drones))
+;; ;; @(:current-goal-list (:drone1  @drones))
+;; (agent-errors (:nav-agent (:drone1 @drones)))
 ;; @(:nav-data (:drone2  @drones))
-;;  @(:nav-data (:drone1  @drones))
+;; ;; @(:nav-data (:drone1  @drones))
 
-;; ;; nav-agent
-;; ;; (pst (first (agent-errors nav-agent)))
 
-;; (mdrone :drone2 :take-off)
-;; (mdrone :drone2 :land)
 
-;; (mdrone :drone1 :take-off)
-;; (mdrone :drone1 :land)
+;; ;; ;; ;; nav-agent
+;; ;; ;; ;; (pst (first (agent-errors nav-agent)))
 
-(end-navstream)
+;; ;; ;; (mdrone :drone2 :take-off)
+;; ;; ;; (mdrone :drone2 :land)
+
+;; ;; ;; (mdrone :drone1 :take-off)
+;; ;; ;; (mdrone :drone1 :land)
+
+;; (end-navstream)
+
+
 
 
 
