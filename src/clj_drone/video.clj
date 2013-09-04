@@ -21,7 +21,7 @@
 (def window (JFrame. "test"))
 (def view (JPanel. ))
 (def stream (atom true))
-(def header-size 68)
+(def header-size 76)
 (def video-agent (agent 0))
 (def save-video (atom false))
 (def vsocket (atom nil))
