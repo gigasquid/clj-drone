@@ -15,8 +15,3 @@
 (drone :land)
 (end-navstream)
 
-(reset! drones {})
-(agent-errors (:nav-agent (:default @drones)))
-
-
-
