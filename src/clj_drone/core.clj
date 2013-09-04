@@ -124,15 +124,17 @@
     (do
       (println "evil error occured: " ex " and we still have value " @ag)
       (print-stack-trace ex)
-      ;; (when (= (.getClass ex) java.net.SocketTimeoutException)
-      ;;   (log/info "Reststarting nav stream")
-      ;;   (def navdata-socket (DatagramSocket. ))
-      ;;   (log/info "redef navdata-socket")
-      ;;   (.setSoTimeout navdata-socket @socket-timeout)
-      ;;   (def nav-agent (agent {}))
-      ;;   (log/info (str "agent now is " nav-agent))
-      ;;   (when-not  @stop-navstream
-      ;;     (mdrone-init-navdata name)))
+      (let [navdata-socket (:navdata-socket (name @drones))
+            nav-agent (:nav-agent (name @drones))]
+       (when (= (.getClass ex) java.net.SocketTimeoutException)
+         (log/info "Reststarting nav stream")
+         (reset! navdata-socket (DatagramSocket. ))
+         (log/info "redef navdata-socket")
+         (.setSoTimeout navdata-socket @socket-timeout)
+         (reset! nav-agent (agent {}))
+         (log/info (str "agent now is " nav-agent))
+         (when-not  @stop-navstream
+           (mdrone-init-navdata name))))
       )))
 
 (defn mdrone-init-navdata [name]
