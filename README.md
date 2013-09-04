@@ -412,8 +412,8 @@ Example:
 (mdrone :drone1 :land)
 ````
 
-Currently only sending commands is supported with multidrone.
-Navigation data is next on the list.
+Multi-drone navigation data and multi-drone with beliefs and goals
+work also. See examples/multi_drone_nav_goals.clj for an example.
 
 
 ## Running locally
@@ -433,7 +433,7 @@ The tests use [Midje](https://github.com/marick/Midje).  Use the midje
 
 ## To do list
 - faster processing of video
-- navigation support for multiple drones
+- video support for multiple drones
 
 ## License
 
