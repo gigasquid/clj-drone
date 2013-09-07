@@ -19,6 +19,16 @@ Using with Leiningen
   :dependencies [[clj-drone "0.1.8"]])
 ````
 
+Run into an error saying that lein can't find opencv?
+
+If you want to use video with opencv, you will need to install the
+opencv-245.jar (found in the opencv directory) into your maven.
+The best way to do this is to use the
+[lein-localrepo plugin](https://github.com/kumarshantanu/lein-localrepo). 
+
+If you don't care about open-cv, then just delete opencv line from the
+project.clj
+
 Sample Usage - Drone Takes off for 10 seconds and then lands
 
 ```clojure
