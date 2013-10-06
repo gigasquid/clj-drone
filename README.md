@@ -19,10 +19,6 @@ Using with Leiningen
   :dependencies [[clj-drone "0.1.8"]])
 ````
 
-## Running locally
-Run into an error saying that lein can't find opencv or h264?
-
-
 You need to install the h264 (for video conversion) jar locally.  You can use the
 [lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
 in. Run:
