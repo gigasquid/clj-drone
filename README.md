@@ -19,15 +19,20 @@ Using with Leiningen
   :dependencies [[clj-drone "0.1.8"]])
 ````
 
-Run into an error saying that lein can't find opencv?
+## Running locally
+Run into an error saying that lein can't find opencv or h264?
 
-If you want to use video with opencv, you will need to install the
-opencv-245.jar (found in the opencv directory) into your maven.
-The best way to do this is to use the
-[lein-localrepo plugin](https://github.com/kumarshantanu/lein-localrepo). 
 
-If you don't care about open-cv, then just delete opencv line from the
-project.clj
+You need to install the h264 (for video conversion) jar locally.  You can use the
+[lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
+in. Run:
+
+    lein localrepo install h264/h264-decoder-1.0.jar h264-decoder/h264-decoder 1.0
+    lein localrepo install opendv/opencv-245.jar opencv/opencv 2.4.5
+
+
+Or - If you don't really care about the vision stuff and you just want to
+fly the drone. Go ahead and remove them from them from the project.clj
 
 Sample Usage - Drone Takes off for 10 seconds and then lands
 
@@ -425,13 +430,6 @@ Example:
 Multi-drone navigation data and multi-drone with beliefs and goals
 work also. See examples/multi_drone_nav_goals.clj for an example.
 
-
-## Running locally
-You need to install the h264 (for video conversion) jar locally.  You can use the
-[lein-localrepo](https://github.com/kumarshantanu/lein-localrepo) plug
-in. Run:
-
-    lein localrepo install h264/h264-decoder-1.0.jar h264-decoder/h264-decoder 1.0
 
 
 ## Running tests
