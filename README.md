@@ -24,7 +24,7 @@ You need to install the h264 (for video conversion) jar locally.  You can use th
 in. Run:
 
     lein localrepo install h264/h264-decoder-1.0.jar h264-decoder/h264-decoder 1.0
-    lein localrepo install opendv/opencv-245.jar opencv/opencv 2.4.5
+    lein localrepo install opencv/opencv-245.jar opencv/opencv 2.4.5
 
 
 Or - If you don't really care about the vision stuff and you just want to
