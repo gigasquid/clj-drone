@@ -10,7 +10,7 @@ Just beginning the start of the control library
 More to come soon.
 
 If you are interested in seeing some demo videos, check out the
-[blog post](http://gigasquidsoftware.com/wordpress/?p=645).
+[blog post](http://gigasquidsoftware.com/blog/2013/02/04/the-joy-of-flying-ar-drones-with-clojure/).
 
 Using with Leiningen
 ```clojure
