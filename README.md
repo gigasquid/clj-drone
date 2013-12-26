@@ -10,7 +10,7 @@ Just beginning the start of the control library
 More to come soon.
 
 If you are interested in seeing some demo videos, check out the
-[blog post](http://gigasquidsoftware.com/wordpress/?p=645).
+[blog post](http://gigasquidsoftware.com/blog/2013/02/04/the-joy-of-flying-ar-drones-with-clojure/).
 
 Using with Leiningen
 ```clojure
@@ -157,7 +157,7 @@ The possible values are:
 :bootstrap ;=> :off or :on
 :motors ;=> :ok or :motor-problem
 :communication ;=> :ok or :communication-lost
-:software ;=> :ok or :sofware-fault
+:software ;=> :ok or :software-fault
 :battery ;=> :ok or :too-low
 :emergency-landing ;=> :off or :on
 :timer ;=> :not-elapsed or :elapsed
@@ -170,7 +170,7 @@ The possible values are:
 :atcodec-thread ;=> :off or :on
 :navdata-thread ;=> :off or :on
 :video-thread ;=> :off or :on
-:acquistion-thread ;=> :off or :on
+:acquisition-thread ;=> :off or :on
 :ctrl-watchdog ;=> :ok or :delay
 :adc-watchdog ;=> :ok or :delay
 :com-watchdog ;=> :ok or :problem
@@ -334,9 +334,9 @@ Converting video can be done with the following command.
 
 ## OpenCV Face Recognition
 Once the video is in png format, it can be sent to OpenCV for
-more processing.  There is an example of facial recogintion in the
+more processing.  There is an example of facial recognition in the
 examples directory.  OpenCV requires native java bindings to run.
-The native library for MacOS  and opencv jar can be found in the opencv
+The native library for MacOS and opencv jar can be found in the opencv
 directory. If you have a different OS, you will need to download
 OpenCV and copy the native lib there.
 
