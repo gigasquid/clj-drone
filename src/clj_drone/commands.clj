@@ -53,6 +53,10 @@
                       :value "\"4,1073741824,1\""}
     :video-frame-rate-15 {:command-class "AT*CONFIG" :option "\"video:codec_fps\""
                       :value "\"15\"" }
+    :video-switch-down {:command-class "AT*CONFIG" :option "\"video:video_channel\""
+                      :value "\"3\""}
+    :video-switch-forward {:command-class "AT*CONFIG" :option "\"video:video_channel\""
+                      :value "\"0\""}
     :hover-on-roundel {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
                        :value "\"2\""}
     :free-flight {:command-class "AT*CONFIG" :option "\"control:flying_mode\""
