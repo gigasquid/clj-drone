@@ -28,7 +28,9 @@ in. Run:
 
 
 Or - If you don't really care about the vision stuff and you just want to
-fly the drone. Go ahead and remove them from them from the project.clj
+fly the drone. Go ahead clone the project and remove them from them from the project.clj
+
+You will also need to create a /logs directory in the root of your project
 
 Sample Usage - Drone Takes off for 10 seconds and then lands
 
