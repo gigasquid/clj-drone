@@ -4,6 +4,8 @@ Why wouldn't you want to control your AR Drone with your Clojure REPL?
 
 A Clojure library to control the Parrot AR Drone 2.0 [http://ardrone2.parrot.com/](http://ardrone2.parrot.com/)
 
+You might also checkout this Clojure Drone library which has some very nice features [https://github.com/wiseman/turboshrimp](https://github.com/wiseman/turboshrimp)
+
 ## Usage
 
 Just beginning the start of the control library
