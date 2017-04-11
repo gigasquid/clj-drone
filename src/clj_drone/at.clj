@@ -21,7 +21,8 @@
          "\r")))
 
 (defn build-pcmd-command [command-key counter & [[v w x y]]]
-  (let [{:keys [command-class command-vec dir] or {dir 1}} (command-key commands)
+  (let [{:keys [command-class command-vec dir]} (command-key commands)
+        dir (or dir 1)
         v-val (when v (cast-float-to-int (* dir v)))
         w-val (when w (cast-float-to-int w))
         x-val (when x (cast-float-to-int x))

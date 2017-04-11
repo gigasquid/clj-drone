@@ -4,6 +4,7 @@
 (drone-initialize)
 ;Use ip and port for non-standard drone ip/port
 ;(initialize ip port)
+(drone :emergency)
 (drone :take-off)
 
 (drone :anim-double-phi-theta-mixed)
@@ -16,4 +17,3 @@
 (drone-do-for 3.75 :fly 0.2 0 0 0.5) ; sprial
 (drone :hover)
 (drone :land)
-
